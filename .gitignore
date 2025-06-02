@@ -52,3 +52,9 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+#Rider
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+.idea

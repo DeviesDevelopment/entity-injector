@@ -1,0 +1,16 @@
+﻿services:
+
+  postgres:
+    image: postgres:17
+    container_name: dbrouter_postgres_test
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  postgres-test-data:
