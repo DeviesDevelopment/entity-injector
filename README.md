@@ -50,3 +50,7 @@ Add license
 Make repository public
 
 Add sample for cosmos db
+
+Add pipeline for running the tests
+
+Extend the tests (with for example expecting failure)
