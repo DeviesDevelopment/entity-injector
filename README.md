@@ -1,12 +1,12 @@
-# DbRouter 
+# EntityInjector 
 
-The purpose of this package is to simplify the process of extracting entities from databases.
+The purpose of this package is to simplify the process of extracting entities from (primarily) databases.
 
 ## Usage
 
 Many controllers implement methods to fetch database models, this package makes that process easier. It works via dependency injection, which avoids direct dependencies to database repositories in for example your controller classes.
 
-The usage is not explicitly restricted to controllers, but that is where this behaviour is most common and it uses the Http context to determine the argument.
+The usage is not explicitly restricted to controllers, but that is where this behaviour is most common, and it uses the HTTP context to determine the argument.
 
 ```c#
 [HttpGet("{id:guid}")]
@@ -54,3 +54,5 @@ Add sample for cosmos db
 Add pipeline for running the tests
 
 Extend the tests (with for example expecting failure)
+
+Add exception handling

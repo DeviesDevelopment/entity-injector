@@ -2,7 +2,7 @@
 
   postgres:
     image: postgres:17
-    container_name: dbrouter_postgres_test
+    container_name: entity_injector_postgres_test
     ports:
       - "5432:5432"
     environment:
