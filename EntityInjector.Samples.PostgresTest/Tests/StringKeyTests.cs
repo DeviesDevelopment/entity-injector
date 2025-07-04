@@ -27,29 +27,24 @@ public class StringKeyTests : IClassFixture<PostgresTestFixture>
             .ConfigureServices(services =>
             {
                 services.AddSingleton(fixture.DbContext);
-                
+
                 // Use only one type of FromRoute bindings per Value type to avoid ambiguous bindings
                 services.AddScoped<IBindingModelDataReceiver<string, User>, StringUserDataReceiver>();
 
                 services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
                 services.AddControllers();
-                
+
                 services.PostConfigureAll<MvcOptions>(options =>
                 {
                     // Use only one type of FromRoute bindings per Value type to avoid ambiguous bindings
                     options.ModelMetadataDetailsProviders.Add(new StringEntityBindingMetadataProvider<User>());
                     options.ModelMetadataDetailsProviders.Add(new StringCollectionBindingMetadataProvider<User>());
-
                 });
             })
             .Configure(app =>
             {
                 app.UseRouting();
-                app.UseEndpoints(endpoints =>
-                {
-                    endpoints.MapControllers();
-                });
-                
+                app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             });
 
         var server = new TestServer(builder);
@@ -62,9 +57,9 @@ public class StringKeyTests : IClassFixture<PostgresTestFixture>
     {
         var expectedUser = await _fixture.DbContext.Users.FirstAsync();
         var userId = expectedUser.Id.ToString();
-        
+
         Assert.NotNull(expectedUser);
-        
+
         var response = await _client.GetAsync($"/api/users/{userId}");
         response.EnsureSuccessStatusCode();
 
@@ -77,8 +72,8 @@ public class StringKeyTests : IClassFixture<PostgresTestFixture>
         Assert.Equal(expectedUser.Id, result!.Id);
         Assert.Equal(expectedUser.Name, result.Name);
     }
-    
-    
+
+
     [Fact]
     public async Task CanFetchMultipleUsersByHttpRequest()
     {
@@ -88,7 +83,7 @@ public class StringKeyTests : IClassFixture<PostgresTestFixture>
         Assert.True(users.Count >= 2, "Need at least 2 users for this test");
 
         var idsCsv = string.Join(",", users.Select(u => u.Id));
-    
+
         var response = await _client.GetAsync($"/api/users/batch/{idsCsv}");
         response.EnsureSuccessStatusCode();
 

@@ -12,8 +12,9 @@ public class IntProductDataReceiver(TestDbContext db) : IBindingModelDataReceive
     {
         return db.Products.FindAsync(key).AsTask();
     }
-    
-    public Task<Dictionary<int, Product>> GetByKeys(List<int> keys, HttpContext httpContext, Dictionary<string, string> metaData)
+
+    public Task<Dictionary<int, Product>> GetByKeys(List<int> keys, HttpContext httpContext,
+        Dictionary<string, string> metaData)
     {
         return db.Products.Where(p => keys.Contains(p.Id)).ToDictionaryAsync(p => p.Id);
     }

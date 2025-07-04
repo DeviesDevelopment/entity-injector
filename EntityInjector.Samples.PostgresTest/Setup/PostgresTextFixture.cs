@@ -1,4 +1,3 @@
-using EntityInjector.Samples.PostgresTest.Models;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -22,7 +21,6 @@ public class PostgresTestFixture : IAsyncLifetime
         // Wait for the database to be ready (retry loop)
         var attempts = 0;
         while (attempts++ < 10)
-        {
             try
             {
                 await DbContext.Users.FirstOrDefaultAsync(); // minimal smoke test
@@ -32,12 +30,14 @@ public class PostgresTestFixture : IAsyncLifetime
             {
                 await Task.Delay(1000);
             }
-        }
 
         // Optionally grab an existing user's ID to use in tests
         var firstUser = await DbContext.Users.FirstOrDefaultAsync();
         SeedId = firstUser?.Id ?? Guid.Empty;
     }
 
-    public Task DisposeAsync() => Task.CompletedTask;
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
 }

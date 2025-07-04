@@ -12,8 +12,9 @@ public class StringUserDataReceiver(TestDbContext db) : IBindingModelDataReceive
     {
         return db.Users.FindAsync(Guid.Parse(key)).AsTask();
     }
-    
-    public Task<Dictionary<string, User>> GetByKeys(List<string> keys, HttpContext httpContext, Dictionary<string, string> metaData)
+
+    public Task<Dictionary<string, User>> GetByKeys(List<string> keys, HttpContext httpContext,
+        Dictionary<string, string> metaData)
     {
         var parsedKeys = keys.Select(Guid.Parse);
         return db.Users.Where(u => parsedKeys.Contains(u.Id)).ToDictionaryAsync(u => u.Id.ToString());

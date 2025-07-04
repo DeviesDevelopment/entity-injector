@@ -13,7 +13,7 @@ public class UserController : ControllerBase
     {
         return Ok(new { user.Id, user.Name, user.Age });
     }
-    
+
     [HttpGet("batch/{ids}")]
     public ActionResult<IEnumerable<User>> GetMany([FromRouteToCollection("ids")] List<User> users)
     {
