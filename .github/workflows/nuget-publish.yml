@@ -1,0 +1,28 @@
+name: Publish NuGet package
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore EntityInjector.Route/EntityInjector.Route.csproj
+
+      - name: Build and pack
+        run: dotnet pack EntityInjector.Route/EntityInjector.Route.csproj -c Release --no-restore
+
+      - name: Publish NuGet package
+        run: dotnet nuget push EntityInjector.Route/bin/Release/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
