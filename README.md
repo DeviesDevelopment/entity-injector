@@ -45,8 +45,6 @@ The tests can be seen in each respective sample. Their databases are set up via 
 
 ## TODO:
 
-Add license
-
 Make repository public
 
 Add sample for cosmos db
