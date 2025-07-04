@@ -1,66 +1,57 @@
 # EntityInjector
 
-The purpose of this package is to simplify the process of extracting entities from (primarily) databases.
+EntityInjector is a set of libraries designed to simplify extracting entities from (primarily) databases
+in a clean and dependency-injected way.
 
-## Usage
+👉 This repository contains multiple NuGet packages:
 
-Many controllers implement methods to fetch database models, this package makes that process easier. It works via
-dependency injection, which avoids direct dependencies to database repositories in for example your controller classes.
+- `EntityInjector.Route` — Route binding to entities (via HTTP context)
+- `EntityInjector.Property` — (coming soon)
 
-The usage is not explicitly restricted to controllers, but that is where this behaviour is most common, and it uses the
-HTTP context to determine the argument.
+## Packages
 
-```c#
-[HttpGet("{id:guid}")]
-public ActionResult<User> GetOne([FromRouteToEntity("id")] User user)
-{
-    return Ok(new { user.Id, user.Name, user.Age });
-}
-```
-
-## Set up
-
-To set up your project, install this package and do the following operations:
-
-- Add a DataReceiver which implements the interface `IBindingModelDataReceiver<Guid, User>` to add the fetching logic
-  dependent on your database.
-- Add dependency injection for your DataReceiver (
-  `services.AddScoped<IBindingModelDataReceiver<Guid, User>, GuidUserDataReceiver>();`)
-- Add dependency injection for the specific `BindingMetadataProviders` you want (
-  `options.ModelMetadataDetailsProviders.Add(new GuidEntityBindingMetadataProvider<User>());`)
+| Package              | NuGet                                                                                                                | Description                                         |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| EntityInjector.Route | [![NuGet](https://img.shields.io/nuget/v/EntityInjector.Route)](https://www.nuget.org/packages/EntityInjector.Route) | Bind route parameters directly to database entities |
 
 ## Samples
 
-There are examples with a postgres (EntityFramework + TestContainers) database which implements this for 2 simple
-models. It shows how you can fetch both one and multiple entities at the same time, and how to configure them with
-differing database keys.
+We provide samples using Postgres + EF Core + TestContainers.
+See: `EntityInjector.Samples.PostgresTest`
 
-## Extensibility
+## Development
 
-There are currently a limited amount of implementations of the `BindingMetadataProviders`,
-but there is nothing stopping you from extending `FromRouteToEntityBindingMetadataProvider` or
-`FromRouteToCollectionBindingMetadataProvider` to use another key.
+- Requires .NET 8 SDK
+- Tests use docker containers
 
-## Limitations
+## Roadmap
 
-There is a limit that for each data type, there can only be one key used. This is due to ambiguous type resolution.
+- Add Cosmos DB sample
+- Extend tests + failure scenarios
+- Exception handling
 
-If you really want multiple ways to reach the same datatype. It is possible to extend FromRouteToEntityAttribute and
-give it a different name that can be used simultaneously. However, that behaviour is discouraged.
+# EntityInjector.Samples.PostgresTest
 
-## Tests
+This sample demonstrates how to use EntityInjector with a Postgres database using Entity Framework Core and TestContainers.  
+It shows how to bind route parameters directly to entities using dependency injection.
 
-The tests can be seen in each respective sample. Their databases are set up via simple docker containers. Instructions
-for how to run them exists in the respective sample
+## Prerequisites
 
-## TODO:
+- Docker installed and running
+- .NET 8 SDK installed
 
-Make repository public
+## How to run
 
-Add sample for cosmos db
+1. From the repository root, start the database using Docker Compose:
 
-Add pipeline for running the tests
+```bash
+docker compose up --build
+```
 
-Extend the tests (with for example expecting failure)
+This will create a Postgres container and run `init.sql` to seed the database with test data.
 
-Add exception handling
+2. From the sample project directory, build and run the tests:
+
+```bash
+dotnet clean && dotnet restore && dotnet test
+```

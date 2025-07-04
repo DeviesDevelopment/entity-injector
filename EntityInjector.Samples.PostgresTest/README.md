@@ -1,16 +1,25 @@
-# Entity Injector Samples Postgres Test
+# EntityInjector.Samples.PostgresTest
 
-To run this, follow these steps:
+This sample demonstrates how to use EntityInjector with a Postgres database using Entity Framework Core and TestContainers.  
+It shows how to bind route parameters directly to entities using dependency injection.
 
-## Prerequisites:
+## Prerequisites
 
-- Working docker installation
-- .NET 8 installed
+- Docker installed and running
+- .NET 8 SDK installed
 
-## Steps:
+## How to run
 
-- In the repo root run `docker compose up --build`
+1. From the repository root, start the database using Docker Compose:
 
-This will create a postgres database and run init.sql to seed the database with test data.
+```bash
+docker compose up --build
+```
 
-- In this project's root run `dotnet clean && dotnet restore && dotnet test`
+This will create a Postgres container and run `init.sql` to seed the database with test data.
+
+2. From the sample project directory, build and run the tests:
+
+```bash
+dotnet clean && dotnet restore && dotnet test
+```
