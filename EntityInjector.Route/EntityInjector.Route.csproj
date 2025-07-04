@@ -7,15 +7,19 @@
         <Company>Devies</Company>
         <Authors>John Johansson; Erik Jergéus</Authors>
         <TargetFramework>netstandard2.1</TargetFramework>
-        <LangVersion>13</LangVersion>
+        <LangVersion>latest</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <Description>A small library for injecting routes into Entity Framework contexts.</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/DeviesDevelopment/entity-injector</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/DeviesDevelopment/entity-injector</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.3.0"/>
     </ItemGroup>
 
 </Project>

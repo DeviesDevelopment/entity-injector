@@ -13,7 +13,7 @@ public class ProductController : ControllerBase
     {
         return Ok(new { product.Id, product.Name, product.Price });
     }
-    
+
     [HttpGet("batch/{ids}")]
     public ActionResult<IEnumerable<Product>> GetMany([FromRouteToCollection("ids")] List<Product> products)
     {

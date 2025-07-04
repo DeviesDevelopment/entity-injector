@@ -11,10 +11,8 @@ public class StringEntityBindingMetadataProvider<TValue> : FromRouteToEntityBind
         var routeValue = context.HttpContext.GetRouteValue(argumentName);
 
         if (routeValue == null)
-        {
             throw new InternalServerErrorException(
                 $"Route parameter '{argumentName}' was not found. Ensure it is correctly specified in the route.");
-        }
 
         return routeValue switch
         {

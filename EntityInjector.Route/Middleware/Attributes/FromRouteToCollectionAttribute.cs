@@ -1,6 +1,6 @@
 namespace EntityInjector.Route.Middleware.Attributes;
 
-[AttributeUsage(AttributeTargets.Parameter, Inherited = true)]
+[AttributeUsage(AttributeTargets.Parameter)]
 public class FromRouteToCollectionAttribute(string argumentName, string? metaData = null) : Attribute
 {
     public readonly string ArgumentName = argumentName;

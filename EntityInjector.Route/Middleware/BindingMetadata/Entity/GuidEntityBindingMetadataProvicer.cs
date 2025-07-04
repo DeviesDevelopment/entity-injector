@@ -4,17 +4,15 @@ using Microsoft.AspNetCore.Routing;
 
 namespace EntityInjector.Route.Middleware.BindingMetadata.Entity;
 
-public class GuidEntityBindingMetadataProvider<TValue> : FromRouteToEntityBindingMetadataProvider<Guid,TValue>
+public class GuidEntityBindingMetadataProvider<TValue> : FromRouteToEntityBindingMetadataProvider<Guid, TValue>
 {
     protected override Guid GetId(ActionContext context, string argumentName)
     {
         var routeValue = context.HttpContext.GetRouteValue(argumentName);
 
         if (routeValue == null)
-        {
             throw new InternalServerErrorException(
                 $"Route value for '{argumentName}' was not found. Make sure it is part of the route pattern.");
-        }
 
         try
         {

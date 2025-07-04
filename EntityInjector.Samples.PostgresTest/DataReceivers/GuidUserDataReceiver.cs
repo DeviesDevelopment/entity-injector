@@ -12,8 +12,9 @@ public class GuidUserDataReceiver(TestDbContext db) : IBindingModelDataReceiver<
     {
         return db.Users.FindAsync(key).AsTask();
     }
-    
-    public Task<Dictionary<Guid, User>> GetByKeys(List<Guid> keys, HttpContext httpContext, Dictionary<string, string> metaData)
+
+    public Task<Dictionary<Guid, User>> GetByKeys(List<Guid> keys, HttpContext httpContext,
+        Dictionary<string, string> metaData)
     {
         return db.Users.Where(u => keys.Contains(u.Id)).ToDictionaryAsync(u => u.Id);
     }

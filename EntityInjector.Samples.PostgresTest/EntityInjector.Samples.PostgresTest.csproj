@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <ProjectReference Include="..\EntityInjector.Route\EntityInjector.Route.csproj" />
+        <ProjectReference Include="..\EntityInjector.Route\EntityInjector.Route.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="8.0.16" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.16" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.16" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0" />
-        <PackageReference Include="xunit" Version="2.9.3" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+        <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="8.0.16"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.16"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.16"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0"/>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.0"/>
+        <PackageReference Include="xunit" Version="2.9.3"/>
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2"/>
     </ItemGroup>
 
-    
+
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
