@@ -26,7 +26,7 @@ public class GuidEntityBindingMetadataProvider<TValue> : FromRouteToEntityBindin
                     $"Route value '{argumentName}' is neither a GUID nor a string that can be parsed into a GUID.")
             };
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             throw new InternalServerErrorException(
                 $"Failed to parse route value '{argumentName}' as a GUID. Value: '{routeValue}'");

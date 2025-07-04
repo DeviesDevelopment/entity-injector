@@ -58,3 +58,4 @@ nunit-*.xml
 riderModule.iml
 /_ReSharper.Caches/
 .idea
+*.DotSettings.user

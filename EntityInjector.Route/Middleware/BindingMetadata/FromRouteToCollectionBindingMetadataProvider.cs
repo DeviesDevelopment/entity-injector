@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
-namespace EntityInjector.Route.Middleware;
+namespace EntityInjector.Route.Middleware.BindingMetadata;
 
 public abstract class FromRouteToCollectionBindingMetadataProvider<TKey, TValue> : IBindingMetadataProvider, IModelBinder
     where TKey : IComparable
