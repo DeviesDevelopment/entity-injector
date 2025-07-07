@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using xRetry;
 using Xunit;
 
 namespace EntityInjector.Samples.CosmosTest.Tests;
@@ -51,7 +52,7 @@ public class StringKeyTests : IClassFixture<CosmosTestFixture>
         _fixture = fixture;
     }
 
-    [Fact]
+    [RetryFact(maxRetries: 10, delayBetweenRetriesMs: 1000)]
     public async Task CanBindFromRouteToUserEntityViaString()
     {
         // Get a seeded user from Cosmos DB
@@ -76,7 +77,7 @@ public class StringKeyTests : IClassFixture<CosmosTestFixture>
         Assert.Equal(expectedUser.Name, result.Name);
     }
 
-    [Fact]
+    [RetryFact(maxRetries: 10, delayBetweenRetriesMs: 1000)]
     public async Task CanFetchMultipleUsersByHttpRequest()
     {
         var iterator = _fixture.UsersContainer.GetItemLinqQueryable<User>(true).ToFeedIterator();

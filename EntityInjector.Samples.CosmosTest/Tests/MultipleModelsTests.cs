@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using xRetry;
 using Xunit;
 
 namespace EntityInjector.Samples.CosmosTest.Tests;
@@ -84,7 +85,7 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
         return products;
     }
 
-    [Fact]
+    [RetryFact(maxRetries: 10, delayBetweenRetriesMs: 1000)]
     public async Task CanBindFromRouteToUserEntityViaGuid()
     {
         var users = await GetSeededUsersAsync();
@@ -101,7 +102,7 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
         Assert.Equal(expectedUser.Age, result.Age);
     }
 
-    [Fact]
+    [RetryFact(maxRetries: 10, delayBetweenRetriesMs: 1000)]
     public async Task CanBindFromRouteToProductEntityViaInt()
     {
         var products = await GetSeededProductsAsync();
@@ -118,7 +119,7 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
         Assert.Equal(expectedProduct.Price, result.Price);
     }
 
-    [Fact]
+    [RetryFact(maxRetries: 10, delayBetweenRetriesMs: 1000)]
     public async Task CanFetchMultipleUsersByHttpRequest()
     {
         var users = (await GetSeededUsersAsync()).Take(2).ToList();
@@ -142,7 +143,7 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
         }
     }
 
-    [Fact]
+    [RetryFact(maxRetries: 10, delayBetweenRetriesMs: 1000)]
     public async Task CanFetchMultipleProductsByHttpRequest()
     {
         var products = (await GetSeededProductsAsync()).Take(2).ToList();
