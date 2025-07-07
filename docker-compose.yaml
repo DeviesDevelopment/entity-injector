@@ -11,6 +11,36 @@
       POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    networks:
+      - entity-injector-net
+
+  cosmos:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:vnext-preview
+    container_name: entity_injector_cosmos_test
+    ports:
+      - "8081:8081"
+      - "1234:1234"
+    command: ["--protocol", "https"]
+    environment:
+      AZURE_COSMOS_EMULATOR_PARTITION_COUNT: 3
+      AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "true"
+    tty: true
+    stdin_open: true
+    healthcheck:
+      test: curl -k https://localhost:8081/_explorer/emulator.pem || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    networks:
+      - entity-injector-net
 
 volumes:
   postgres-test-data:
+
+networks:
+  entity-injector-net:

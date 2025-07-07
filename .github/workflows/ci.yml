@@ -1,0 +1,55 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Start services
+        run: docker compose up -d
+
+      - name: Wait for services to be healthy
+        run: |
+          for svc in entity_injector_postgres_test entity_injector_cosmos_test; do
+            echo "Waiting for $svc to be healthy..."
+            for i in {1..30}; do
+              STATUS=$(docker inspect --format='{{json .State.Health.Status}}' $svc)
+              echo "$svc health status: $STATUS"
+              if [ "$STATUS" = "\"healthy\"" ]; then
+                echo "$svc is healthy!"
+                break
+              fi
+              if [ "$i" -eq 30 ]; then
+                echo "$svc did not become healthy in time"
+                docker logs $svc
+                exit 1
+              fi
+              sleep 5
+            done
+          done
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test --no-build --configuration Release
+
+      - name: Shutdown services
+        if: always()
+        run: docker compose down
