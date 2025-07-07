@@ -1,0 +1,52 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Compose
+        run: docker-compose --version
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Start services
+        run: docker-compose up -d
+
+      - name: Wait for Postgres
+        run: |
+          echo "Waiting for Postgres..."
+          until docker exec entity_injector_postgres_test pg_isready -U postgres; do
+            sleep 2
+          done
+
+      - name: Wait for Cosmos Emulator
+        run: |
+          echo "Waiting for Cosmos Emulator..."
+          until curl --insecure --fail https://localhost:8081/_explorer/emulator.pem; do
+            sleep 5
+          done
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run tests
+        run: dotnet test --no-build --configuration Release
+
+      - name: Shutdown services
+        if: always()
+        run: docker-compose down

@@ -11,9 +11,11 @@ public class CosmosTestFixture : IAsyncLifetime
     public Container UsersContainer { get; private set; } = default!;
     public Container ProductsContainer { get; private set; } = default!;
 
+    private const string AccountKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+
     public async Task InitializeAsync()
     {
-        var connectionString = "AccountEndpoint=https://localhost:8081/;AccountKey=C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==;";
+        var connectionString = $"AccountEndpoint=https://localhost:8081/;AccountKey={AccountKey};";
         Client = new CosmosClient(connectionString, new CosmosClientOptions
         {
             ConnectionMode = ConnectionMode.Gateway,
