@@ -1,6 +1,5 @@
 using EntityInjector.Samples.CosmosTest.Models;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Azure.Cosmos.Linq;
 using Xunit;
 using User = EntityInjector.Samples.CosmosTest.Models.User;
 

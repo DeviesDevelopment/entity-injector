@@ -27,8 +27,8 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
             .ConfigureServices(services =>
             {
                 services.AddSingleton(fixture.Client);
-                services.AddSingleton(fixture.UsersContainer);
-                services.AddSingleton(fixture.ProductsContainer);
+                services.AddSingleton(new CosmosContainer<User>(fixture.UsersContainer));
+                services.AddSingleton(new CosmosContainer<Product>(fixture.ProductsContainer));
 
                 services.AddScoped<IBindingModelDataReceiver<Guid, User>, GuidUserDataReceiver>();
                 services.AddScoped<IBindingModelDataReceiver<int, Product>, IntProductDataReceiver>();

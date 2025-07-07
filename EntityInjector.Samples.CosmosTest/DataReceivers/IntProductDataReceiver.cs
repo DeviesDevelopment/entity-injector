@@ -1,16 +1,19 @@
 using EntityInjector.Route.Interfaces;
 using EntityInjector.Samples.CosmosTest.Models;
+using EntityInjector.Samples.CosmosTest.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 
 namespace EntityInjector.Samples.CosmosTest.DataReceivers;
 
-public class IntProductDataReceiver(Container container) : IBindingModelDataReceiver<int, Product>
+public class IntProductDataReceiver(CosmosContainer<Product> cosmosContainer) : IBindingModelDataReceiver<int, Product>
 {
+    private readonly Container _container = cosmosContainer.Container;
+    
     public async Task<Product?> GetByKey(int key, HttpContext httpContext, Dictionary<string, string> metaData)
     {
-        var query = container.GetItemLinqQueryable<Product>(true)
+        var query = _container.GetItemLinqQueryable<Product>(true)
             .Where(p => p.Id == key.ToString())
             .ToFeedIterator();
 
@@ -27,7 +30,7 @@ public class IntProductDataReceiver(Container container) : IBindingModelDataRece
     {
         var stringKeys = keys.Select(k => k.ToString()).ToList();
 
-        var query = container.GetItemLinqQueryable<Product>(true)
+        var query = _container.GetItemLinqQueryable<Product>(true)
             .Where(p => stringKeys.Contains(p.Id))
             .ToFeedIterator();
 

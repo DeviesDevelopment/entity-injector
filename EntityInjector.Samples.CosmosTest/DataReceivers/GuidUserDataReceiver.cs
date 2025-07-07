@@ -1,17 +1,20 @@
 using EntityInjector.Route.Interfaces;
+using EntityInjector.Samples.CosmosTest.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Cosmos;
 using User = EntityInjector.Samples.CosmosTest.Models.User;
 
 namespace EntityInjector.Samples.CosmosTest.DataReceivers;
 
-public class GuidUserDataReceiver(Container container) : IBindingModelDataReceiver<Guid, User>
+public class GuidUserDataReceiver(CosmosContainer<User> cosmosContainer) : IBindingModelDataReceiver<Guid, User>
 {
+    private readonly Container _container = cosmosContainer.Container;
     public async Task<User?> GetByKey(Guid key, HttpContext httpContext, Dictionary<string, string> metaData)
     {
         try
         {
-            var response = await container.ReadItemAsync<User>(key.ToString(), PartitionKey.None);
+            var pk = new PartitionKey(key.ToString());
+            var response = await _container.ReadItemAsync<User>(key.ToString(), pk);
             return response.Resource;
         }
         catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
