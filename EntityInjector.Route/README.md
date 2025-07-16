@@ -28,19 +28,38 @@ services.AddScoped<IBindingModelDataReceiver<Guid, User>, GuidUserDataReceiver>(
 options.ModelMetadataDetailsProviders.Add(new GuidEntityBindingMetadataProvider<User>());
 ```
 
+3. (Optionally) Configure exception handling:
+
+```csharp
+services.AddRouteBinding();
+...
+app.UseRouteBinding();
+```
+
+You may also opt to configure your own `ProblemDetailsFactory` to customize your exception logic (to for example hide error messages). 
+In such a case avoid `app.UseRouteBinding()` and instead add your own:
+```csharp
+services.TryAddSingleton<IRouteBindingProblemDetailsFactory, YourCustomRouteBindingProblemDetailsFactory>();
+```
+
+An example of this can be found in the `CustomFactoryExceptionTests`
+
 ## Samples
 
-See the Postgres sample using Entity Framework Core and TestContainers:  
-https://github.com/devies-ab/EntityInjector.Route/tree/main/EntityInjector.Samples.PostgresTest
+See the Sample projects for demonstration on how to:
 
-The sample demonstrates:
-
+- Configure a Postgres database with TestContainers
+- Configure a Cosmos database
 - Fetching single and multiple entities
 - Configuring different entity keys
+- Enabling exception management
+- Configuring custom exception management
 
 ## Extensibility
 
 You can extend `FromRouteToEntityBindingMetadataProvider` or `FromRouteToCollectionBindingMetadataProvider` to support custom key types beyond what is included.
+
+You can also configure your own exception management as described earlier.
 
 ## Limitations
 

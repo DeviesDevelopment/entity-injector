@@ -11,23 +11,13 @@ public class GuidEntityBindingMetadataProvider<TValue> : FromRouteToEntityBindin
         var routeValue = context.HttpContext.GetRouteValue(argumentName);
 
         if (routeValue == null)
-            throw new InternalServerErrorException(
-                $"Route value for '{argumentName}' was not found. Make sure it is part of the route pattern.");
+            throw new MissingRouteParameterException(argumentName);
 
-        try
+        return routeValue switch
         {
-            return routeValue switch
-            {
-                Guid g => g,
-                string s when Guid.TryParse(s, out var parsed) => parsed,
-                _ => throw new InvalidCastException(
-                    $"Route value '{argumentName}' is neither a GUID nor a string that can be parsed into a GUID.")
-            };
-        }
-        catch (Exception)
-        {
-            throw new InternalServerErrorException(
-                $"Failed to parse route value '{argumentName}' as a GUID. Value: '{routeValue}'");
-        }
+            Guid g => g,
+            string s when Guid.TryParse(s, out var parsed) => parsed,
+            _ => throw new InvalidRouteParameterFormatException(argumentName, typeof(Guid), routeValue.GetType())
+        };
     }
 }

@@ -16,8 +16,9 @@ in a clean and dependency-injected way.
 
 ## Samples
 
-We provide samples using Postgres + EF Core + TestContainers.
-See: `EntityInjector.Samples.PostgresTest`
+We provide extended test samples using Postgres + EF Core + TestContainers and basic samples with a Cosmos emulator.
+
+See: `EntityInjector.Samples.PostgresTest` and `EntityInjector.Samples.CosmosTest`
 
 ## Development
 
@@ -26,6 +27,4 @@ See: `EntityInjector.Samples.PostgresTest`
 
 ## Roadmap
 
-- Add Cosmos DB sample
-- Extend tests + failure scenarios
-- Exception handling
+- Fetching data from Property

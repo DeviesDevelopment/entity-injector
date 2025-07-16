@@ -4,21 +4,18 @@ using Microsoft.AspNetCore.Routing;
 
 namespace EntityInjector.Route.Middleware.BindingMetadata.Collection;
 
-public class
-    StringCollectionBindingMetadataProvider<TValue> : FromRouteToCollectionBindingMetadataProvider<string, TValue>
+public class StringCollectionBindingMetadataProvider<TValue> : FromRouteToCollectionBindingMetadataProvider<string, TValue>
 {
     protected override List<string> GetIds(ActionContext context, string argumentName)
     {
         var routeValue = context.HttpContext.GetRouteValue(argumentName);
 
         if (routeValue == null)
-            throw new InternalServerErrorException(
-                $"No route value found for parameter '{argumentName}'. Ensure it's included in the route.");
+            throw new MissingRouteParameterException(argumentName);
 
         var rawString = routeValue.ToString();
         if (string.IsNullOrWhiteSpace(rawString))
-            throw new InternalServerErrorException(
-                $"Route parameter '{argumentName}' is present but empty. Expected a comma-separated list of GUIDs.");
+            throw new InvalidRouteParameterFormatException(argumentName, typeof(string), routeValue.GetType());
 
         var segments = rawString
             .Split(',', StringSplitOptions.RemoveEmptyEntries)
@@ -27,8 +24,7 @@ public class
             .ToList();
 
         if (segments.Count == 0)
-            throw new InternalServerErrorException(
-                $"Route parameter '{argumentName}' did not contain any valid string segments.");
+            throw new EmptyRouteSegmentListException(argumentName);
 
         return segments;
     }

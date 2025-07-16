@@ -21,7 +21,11 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
 {
     private readonly HttpClient _client;
     private readonly CosmosTestFixture _fixture;
-
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+    
     public CosmosMultipleModelsTests(CosmosTestFixture fixture)
     {
         var builder = new WebHostBuilder()
@@ -95,7 +99,7 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<User>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        var result = JsonSerializer.Deserialize<User>(json, _jsonOptions);
 
         Assert.Equal(expectedUser.Id, result!.Id);
         Assert.Equal(expectedUser.Name, result.Name);
@@ -112,7 +116,7 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<Product>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        var result = JsonSerializer.Deserialize<Product>(json, _jsonOptions);
 
         Assert.Equal(expectedProduct.Id, result!.Id);
         Assert.Equal(expectedProduct.Name, result.Name);
@@ -129,7 +133,7 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();
-        var returnedUsers = JsonSerializer.Deserialize<List<User>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        var returnedUsers = JsonSerializer.Deserialize<List<User>>(json, _jsonOptions);
 
         Assert.NotNull(returnedUsers);
         Assert.Equal(users.Count, returnedUsers!.Count);
@@ -153,7 +157,7 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();
-        var returnedProducts = JsonSerializer.Deserialize<List<Product>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        var returnedProducts = JsonSerializer.Deserialize<List<Product>>(json, _jsonOptions);
 
         Assert.NotNull(returnedProducts);
         Assert.Equal(products.Count, returnedProducts!.Count);

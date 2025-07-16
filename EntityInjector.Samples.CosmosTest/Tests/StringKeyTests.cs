@@ -21,7 +21,11 @@ public class StringKeyTests : IClassFixture<CosmosTestFixture>
 {
     private readonly HttpClient _client;
     private readonly CosmosTestFixture _fixture;
-
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+    
     public StringKeyTests(CosmosTestFixture fixture)
     {
         var builder = new WebHostBuilder()
@@ -68,10 +72,7 @@ public class StringKeyTests : IClassFixture<CosmosTestFixture>
         httpResponse.EnsureSuccessStatusCode();
 
         var json = await httpResponse.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<User>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var result = JsonSerializer.Deserialize<User>(json, _jsonOptions);
 
         Assert.Equal(expectedUser.Id, result!.Id);
         Assert.Equal(expectedUser.Name, result.Name);
@@ -97,10 +98,7 @@ public class StringKeyTests : IClassFixture<CosmosTestFixture>
         httpResponse.EnsureSuccessStatusCode();
 
         var json = await httpResponse.Content.ReadAsStringAsync();
-        var returnedUsers = JsonSerializer.Deserialize<List<User>>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var returnedUsers = JsonSerializer.Deserialize<List<User>>(json, _jsonOptions);
 
         Assert.NotNull(returnedUsers);
         Assert.Equal(users.Count, returnedUsers!.Count);

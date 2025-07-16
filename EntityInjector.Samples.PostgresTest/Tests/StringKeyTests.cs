@@ -20,7 +20,11 @@ public class StringKeyTests : IClassFixture<PostgresTestFixture>
 {
     private readonly HttpClient _client;
     private readonly PostgresTestFixture _fixture;
-
+    private readonly JsonSerializerOptions _jsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+    
     public StringKeyTests(PostgresTestFixture fixture)
     {
         var builder = new WebHostBuilder()
@@ -64,10 +68,7 @@ public class StringKeyTests : IClassFixture<PostgresTestFixture>
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<User>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var result = JsonSerializer.Deserialize<User>(json, _jsonOptions);
 
         Assert.Equal(expectedUser.Id, result!.Id);
         Assert.Equal(expectedUser.Name, result.Name);
@@ -88,10 +89,7 @@ public class StringKeyTests : IClassFixture<PostgresTestFixture>
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync();
-        var returnedUsers = JsonSerializer.Deserialize<List<User>>(json, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
+        var returnedUsers = JsonSerializer.Deserialize<List<User>>(json, _jsonOptions);
 
         Assert.NotNull(returnedUsers);
         Assert.Equal(users.Count, returnedUsers!.Count);
