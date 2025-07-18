@@ -41,6 +41,15 @@ Each key type requires a separate action filter inheriting from FromPropertyToEn
 
 You can control how missing or unmatched entity references are handled using optional metadata flags in the `[FromPropertyToEntity]` attribute:
 
+4. (Optional) Configure a swagger filter for the entities:
+
+```csharp
+services.PostConfigureAll<SwaggerGenOptions>(o =>
+{
+    o.SchemaFilter<FromPropertyToEntitySchemaFilter>();
+});
+```
+
 ### cleanNoMatch
 
 Type: `bool` (as a `string` key in MetaData)

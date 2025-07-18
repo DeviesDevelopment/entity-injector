@@ -44,6 +44,15 @@ services.TryAddSingleton<IRouteBindingProblemDetailsFactory, YourCustomRouteBind
 
 An example of this can be found in the `CustomFactoryExceptionTests`
 
+4. (Optionally) Add a swagger filter for the entities:
+
+```csharp
+services.PostConfigureAll<SwaggerGenOptions>(o =>
+{
+    o.OperationFilter<FromRouteToEntityOperationFilter>();
+});
+```
+
 ## Samples
 
 See the Sample projects for demonstration on how to:
