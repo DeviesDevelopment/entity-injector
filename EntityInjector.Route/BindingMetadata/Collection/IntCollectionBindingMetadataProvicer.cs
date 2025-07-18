@@ -22,12 +22,10 @@ public class IntCollectionBindingMetadataProvider<TValue> : FromRouteToCollectio
         var parsedInts = new List<int>();
 
         foreach (var segment in segments)
-        {
             if (int.TryParse(segment, out var parsed))
                 parsedInts.Add(parsed);
             else
                 invalidSegments.Add(segment);
-        }
 
         if (invalidSegments.Any())
             throw new InvalidEntityParameterFormatException(

@@ -24,11 +24,12 @@ public class StringExceptionTests : IClassFixture<PostgresTestFixture>
 {
     private readonly HttpClient _client;
     private readonly PostgresTestFixture _fixture;
+
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
-    
+
     public StringExceptionTests(PostgresTestFixture fixture)
     {
         var builder = new WebHostBuilder()
@@ -47,15 +48,14 @@ public class StringExceptionTests : IClassFixture<PostgresTestFixture>
                     // Use only one type of FromRoute bindings per Value type to avoid ambiguous bindings
                     options.ModelMetadataDetailsProviders.Add(new StringEntityBindingMetadataProvider<User>());
                     options.ModelMetadataDetailsProviders.Add(new StringCollectionBindingMetadataProvider<User>());
-                    
+
                     // Add Product binding metadata, but omit the receiver on purpose
                     options.ModelMetadataDetailsProviders.Add(new IntEntityBindingMetadataProvider<Product>());
                 });
                 services.PostConfigureAll<SwaggerGenOptions>(o =>
                 {
                     o.OperationFilter<FromRouteToEntityOperationFilter>();
-                });                
-
+                });
             })
             .Configure(app =>
             {
@@ -87,13 +87,13 @@ public class StringExceptionTests : IClassFixture<PostgresTestFixture>
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
         var expected = new EntityNotFoundException("User", nonexistentUserId);
-        
+
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);
         Assert.Contains(expected.Message, problem.Detail);
         Assert.Equal(requestUri, problem!.Instance);
     }
-    
+
     [Fact]
     public async Task ReturnsBadRequestWhenRouteParameterIsMissing()
     {
@@ -111,14 +111,14 @@ public class StringExceptionTests : IClassFixture<PostgresTestFixture>
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
         var expected = new MissingEntityParameterException("id");
-        
+
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);
         Assert.Equal(expected.Message, problem.Detail);
         Assert.Equal(requestUri, problem.Instance);
     }
 
-    
+
     [Fact]
     public async Task ReturnsInternalServerErrorWhenNoReceiverIsRegistered()
     {
@@ -142,7 +142,7 @@ public class StringExceptionTests : IClassFixture<PostgresTestFixture>
         Assert.Equal(expected.Message, problem.Detail);
         Assert.Equal(requestUri, problem.Instance);
     }
-    
+
     [Fact]
     public async Task ReturnsBadRequestWhenRouteCollectionParameterIsEmpty()
     {

@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using EntityInjector.Property.Attributes;
 using EntityInjector.Samples.PostgresTest.Models.Entities;
 
@@ -8,7 +6,7 @@ namespace EntityInjector.Samples.PostgresTest.Models;
 public class ProjectModel
 {
     public Guid Id { get; set; }
-    
+
     public string Name { get; set; } = "";
 
     public List<Guid> LeadIds { get; set; } = [];

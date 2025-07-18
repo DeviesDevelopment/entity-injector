@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json;
 using EntityInjector.Core.Interfaces;
 using EntityInjector.Property.Filters;
@@ -21,6 +22,7 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
 {
     private readonly HttpClient _client;
     private readonly PostgresTestFixture _fixture;
+
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
@@ -42,11 +44,11 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
                 {
                     options.Filters.Add<GuidFromPropertyToEntityActionFilter>();
                 });
-                
+
                 services.PostConfigureAll<SwaggerGenOptions>(o =>
                 {
                     o.SchemaFilter<FromPropertyToEntitySchemaFilter>();
-                });                
+                });
             })
             .Configure(app =>
             {
@@ -58,7 +60,7 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
         _client = server.CreateClient();
         _fixture = fixture;
     }
-    
+
     [Fact]
     public async Task CanHydrateUserEntityFromOwnerIdOnPost()
     {
@@ -74,7 +76,7 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
         };
 
         var json = JsonSerializer.Serialize(petModel);
-        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
         var response = await _client.PostAsync("/api/pets", content);
@@ -119,7 +121,7 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
         };
 
         var json = JsonSerializer.Serialize(petModels);
-        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
         var response = await _client.PostAsync("/api/pets/bulk", content);
@@ -138,7 +140,7 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
             Assert.Equal(expectedUser.Name, pet.Owner.Name);
         }
     }
-    
+
     [Fact]
     public async Task CanHydrateUserEntitiesFromDictionaryOnPost()
     {
@@ -147,14 +149,14 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
 
         var petDict = new Dictionary<string, PetModel>
         {
-            ["bella"] = new PetModel
+            ["bella"] = new()
             {
                 Id = Guid.NewGuid(),
                 Name = "Bella",
                 Species = "Dog",
                 OwnerId = expectedUser.Id
             },
-            ["max"] = new PetModel
+            ["max"] = new()
             {
                 Id = Guid.NewGuid(),
                 Name = "Max",
@@ -164,7 +166,7 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
         };
 
         var json = JsonSerializer.Serialize(petDict);
-        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
         var response = await _client.PostAsync("/api/pets/by-name", content);
@@ -183,7 +185,7 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
             Assert.Equal(expectedUser.Name, pet.Owner.Name);
         }
     }
-    
+
     [Fact]
     public async Task CanHydrateUserEntitiesFromListOnPost()
     {
@@ -198,7 +200,7 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
         };
 
         var json = JsonSerializer.Serialize(project);
-        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
         var response = await _client.PostAsync("/api/projects", content);
@@ -214,11 +216,9 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
         Assert.Equal(2, returned.Leads.Count);
 
         foreach (var expected in expectedUsers)
-        {
             Assert.Contains(returned.Leads, l => l.Id == expected.Id && l.Name == expected.Name);
-        }
     }
-    
+
     [Fact]
     public async Task CanHandleNullableForeignKey_AsNull_SingleEntity()
     {
@@ -231,7 +231,7 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
         };
 
         var json = JsonSerializer.Serialize(petModel);
-        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         var response = await _client.PostAsync("/api/pets/nullable", content);
         response.EnsureSuccessStatusCode();
@@ -259,7 +259,7 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
         };
 
         var json = JsonSerializer.Serialize(model);
-        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+        var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
         var response = await _client.PostAsync("/api/projects/nullable", content);
@@ -279,6 +279,4 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
         Assert.Null(returned.Leads[1]);
         Assert.Equal(users[2].Id, returned.Leads[2]!.Id);
     }
-
-
 }

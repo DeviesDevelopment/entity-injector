@@ -1,3 +1,4 @@
+using System.Net;
 using EntityInjector.Core.Interfaces;
 using EntityInjector.Samples.CosmosTest.Setup;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +10,7 @@ namespace EntityInjector.Samples.CosmosTest.DataReceivers;
 public class StringUserDataReceiver(CosmosContainer<User> cosmosContainer) : IBindingModelDataReceiver<string, User>
 {
     private readonly Container _container = cosmosContainer.Container;
+
     public async Task<User?> GetByKey(string key, HttpContext httpContext, Dictionary<string, string> metaData)
     {
         try
@@ -17,23 +19,21 @@ public class StringUserDataReceiver(CosmosContainer<User> cosmosContainer) : IBi
             var response = await _container.ReadItemAsync<User>(key, pk);
             return response.Resource;
         }
-        catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
         {
             return null;
         }
     }
 
-    public async Task<Dictionary<string, User>> GetByKeys(List<string> keys, HttpContext httpContext, Dictionary<string, string> metaData)
+    public async Task<Dictionary<string, User>> GetByKeys(List<string> keys, HttpContext httpContext,
+        Dictionary<string, string> metaData)
     {
         var result = new Dictionary<string, User>();
 
         foreach (var key in keys)
         {
             var user = await GetByKey(key, httpContext, metaData);
-            if (user != null)
-            {
-                result[key] = user;
-            }
+            if (user != null) result[key] = user;
         }
 
         return result;

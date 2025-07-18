@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Routing;
 
 namespace EntityInjector.Route.BindingMetadata.Collection;
 
-public class StringCollectionBindingMetadataProvider<TValue> : FromRouteToCollectionBindingMetadataProvider<string, TValue>
+public class
+    StringCollectionBindingMetadataProvider<TValue> : FromRouteToCollectionBindingMetadataProvider<string, TValue>
 {
     protected override List<string> GetIds(ActionContext context, string argumentName)
     {

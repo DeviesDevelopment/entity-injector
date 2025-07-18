@@ -8,20 +8,25 @@ public class IntFromPropertyToEntityActionFilter(
     ILogger<IntFromPropertyToEntityActionFilter> logger)
     : FromPropertyToEntityActionFilter<int>(serviceProvider, logger)
 {
- 
-    protected override int ConvertToKey(object rawValue) => rawValue switch
+    protected override int ConvertToKey(object rawValue)
     {
-        int i => i,
-        long l and >= int.MinValue and <= int.MaxValue => (int)l,
-        short s => s,
-        byte b => b,
-        string str when int.TryParse(str, out var parsed) => parsed,
-        double d when d % 1 == 0 && d is >= int.MinValue and <= int.MaxValue => (int)d,
-        float f when f % 1 == 0 && f is >= int.MinValue and <= int.MaxValue => (int)f,
-        decimal m when m % 1 == 0 && m is >= int.MinValue and <= int.MaxValue => (int)m,
-        _ => throw new InvalidEntityParameterFormatException("id", typeof(int), rawValue.GetType())
-    };
+        return rawValue switch
+        {
+            int i => i,
+            long l and >= int.MinValue and <= int.MaxValue => (int)l,
+            short s => s,
+            byte b => b,
+            string str when int.TryParse(str, out var parsed) => parsed,
+            double d when d % 1 == 0 && d is >= int.MinValue and <= int.MaxValue => (int)d,
+            float f when f % 1 == 0 && f is >= int.MinValue and <= int.MaxValue => (int)f,
+            decimal m when m % 1 == 0 && m is >= int.MinValue and <= int.MaxValue => (int)m,
+            _ => throw new InvalidEntityParameterFormatException("id", typeof(int), rawValue.GetType())
+        };
+    }
 
 
-    protected override int GetDefaultValueForNull() => 0;
+    protected override int GetDefaultValueForNull()
+    {
+        return 0;
+    }
 }

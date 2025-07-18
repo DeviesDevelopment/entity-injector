@@ -1,20 +1,20 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <ProjectReference Include="..\EntityInjector.Property\EntityInjector.Property.csproj" />
+        <ProjectReference Include="..\EntityInjector.Property\EntityInjector.Property.csproj"/>
         <ProjectReference Include="..\EntityInjector.Route\EntityInjector.Route.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="8.0.18" />
+        <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="8.0.18"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.16"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.18" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.0.18"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0"/>
-        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11"/>
         <PackageReference Include="xunit" Version="2.9.3"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.2">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
 

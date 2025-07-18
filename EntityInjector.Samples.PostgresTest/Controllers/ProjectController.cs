@@ -17,7 +17,7 @@ public class ProjectController : ControllerBase
             Leads = model.Leads!
         });
     }
-    
+
     [HttpPost("nullable")]
     public ActionResult<ProjectDto> PostProjectWithNullableLeads([FromBody] ProjectModelWithNullableLeads model)
     {

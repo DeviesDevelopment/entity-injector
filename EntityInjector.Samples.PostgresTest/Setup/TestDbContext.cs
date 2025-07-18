@@ -1,4 +1,3 @@
-using EntityInjector.Samples.PostgresTest.Models;
 using EntityInjector.Samples.PostgresTest.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 

@@ -17,7 +17,8 @@ public class StringEntityBindingMetadataProvider<TValue> : FromRouteToEntityBind
         {
             string s when !string.IsNullOrWhiteSpace(s) => s,
             Guid g => g.ToString(),
-            _ => throw new InvalidEntityParameterFormatException(argumentName, routeValue.GetType(), routeValue.GetType())
+            _ => throw new InvalidEntityParameterFormatException(argumentName, routeValue.GetType(),
+                routeValue.GetType())
         };
     }
 }

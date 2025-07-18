@@ -22,11 +22,12 @@ public class StringKeyTests : IClassFixture<PostgresTestFixture>
 {
     private readonly HttpClient _client;
     private readonly PostgresTestFixture _fixture;
+
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
-    
+
     public StringKeyTests(PostgresTestFixture fixture)
     {
         var builder = new WebHostBuilder()
@@ -49,8 +50,7 @@ public class StringKeyTests : IClassFixture<PostgresTestFixture>
                 services.PostConfigureAll<SwaggerGenOptions>(o =>
                 {
                     o.OperationFilter<FromRouteToEntityOperationFilter>();
-                });                
-
+                });
             })
             .Configure(app =>
             {

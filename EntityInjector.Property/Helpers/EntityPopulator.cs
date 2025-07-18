@@ -17,21 +17,17 @@ internal static class EntityPopulator
     {
         if (ids.Count == 0) return;
 
-        bool cleanNoMatch = metaData.ContainsKey("cleanNoMatch");
-        bool includeNulls = metaData.ContainsKey("includeNulls");
+        var cleanNoMatch = metaData.ContainsKey("cleanNoMatch");
+        var includeNulls = metaData.ContainsKey("includeNulls");
 
         if (IsDictionaryType(targetProperty.PropertyType))
-        {
-            PopulateDictionary(targetObject, targetProperty, ids, fetchedEntities, modelState, cleanNoMatch, includeNulls);
-        }
+            PopulateDictionary(targetObject, targetProperty, ids, fetchedEntities, modelState, cleanNoMatch,
+                includeNulls);
         else if (IsEnumerableButNotString(targetProperty.PropertyType))
-        {
             PopulateList(targetObject, targetProperty, ids, fetchedEntities, modelState, cleanNoMatch, includeNulls);
-        }
         else
-        {
-            PopulateSingle(targetObject, targetProperty, ids[0], fetchedEntities, modelState, cleanNoMatch, includeNulls);
-        }
+            PopulateSingle(targetObject, targetProperty, ids[0], fetchedEntities, modelState, cleanNoMatch,
+                includeNulls);
     }
 
     private static void PopulateDictionary(
@@ -43,26 +39,17 @@ internal static class EntityPopulator
         bool cleanNoMatch,
         bool includeNulls)
     {
-        var dict = prop.GetValue(targetObject) as IDictionary 
+        var dict = prop.GetValue(targetObject) as IDictionary
                    ?? Activator.CreateInstance(prop.PropertyType) as IDictionary;
 
         dict?.Clear();
 
         foreach (var id in ids)
-        {
             if (fetchedEntities.Contains(id))
-            {
                 dict![id!] = fetchedEntities[id!];
-            }
             else if (includeNulls)
-            {
                 dict![id!] = null;
-            }
-            else if (!cleanNoMatch)
-            {
-                modelState.AddModelError(prop.Name, $"No matching entity found for ID '{id}'.");
-            }
-        }
+            else if (!cleanNoMatch) modelState.AddModelError(prop.Name, $"No matching entity found for ID '{id}'.");
 
         prop.SetValue(targetObject, dict);
     }
@@ -79,20 +66,11 @@ internal static class EntityPopulator
         var matched = new List<object?>();
 
         foreach (var id in ids)
-        {
             if (fetchedEntities.Contains(id))
-            {
                 matched.Add(fetchedEntities[id!]);
-            }
             else if (includeNulls)
-            {
                 matched.Add(null);
-            }
-            else if (!cleanNoMatch)
-            {
-                modelState.AddModelError(prop.Name, $"No matching entity found for ID '{id}'.");
-            }
-        }
+            else if (!cleanNoMatch) modelState.AddModelError(prop.Name, $"No matching entity found for ID '{id}'.");
 
         prop.SetValue(targetObject, ConvertListToTargetType(matched, prop.PropertyType));
     }
@@ -107,17 +85,10 @@ internal static class EntityPopulator
         bool includeNulls)
     {
         if (fetchedEntities.Contains(id))
-        {
             prop.SetValue(targetObject, fetchedEntities[id!]);
-        }
         else if (includeNulls)
-        {
             prop.SetValue(targetObject, null);
-        }
-        else if (!cleanNoMatch)
-        {
-            modelState.AddModelError(prop.Name, $"No matching entity found for ID '{id}'.");
-        }
+        else if (!cleanNoMatch) modelState.AddModelError(prop.Name, $"No matching entity found for ID '{id}'.");
     }
 
     private static object? ConvertListToTargetType(List<object?> values, Type propType)
@@ -126,7 +97,7 @@ internal static class EntityPopulator
         {
             var elementType = propType.GetElementType()!;
             var array = Array.CreateInstance(elementType, values.Count);
-            for (int i = 0; i < values.Count; i++)
+            for (var i = 0; i < values.Count; i++)
                 array.SetValue(values[i], i);
             return array;
         }
@@ -150,12 +121,16 @@ internal static class EntityPopulator
         return values;
     }
 
-    private static bool IsDictionaryType(Type type) =>
-        typeof(IDictionary).IsAssignableFrom(type) ||
-        (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>));
+    private static bool IsDictionaryType(Type type)
+    {
+        return typeof(IDictionary).IsAssignableFrom(type) ||
+               (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>));
+    }
 
-    private static bool IsEnumerableButNotString(Type type) =>
-        type != typeof(string) &&
-        typeof(IEnumerable).IsAssignableFrom(type) &&
-        !typeof(IDictionary).IsAssignableFrom(type);
+    private static bool IsEnumerableButNotString(Type type)
+    {
+        return type != typeof(string) &&
+               typeof(IEnumerable).IsAssignableFrom(type) &&
+               !typeof(IDictionary).IsAssignableFrom(type);
+    }
 }

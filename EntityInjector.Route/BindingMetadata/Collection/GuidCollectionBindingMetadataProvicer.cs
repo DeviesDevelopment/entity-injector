@@ -22,12 +22,10 @@ public class GuidCollectionBindingMetadataProvider<TValue> : FromRouteToCollecti
         var parsedGuids = new List<Guid>();
 
         foreach (var segment in segments)
-        {
             if (Guid.TryParse(segment, out var parsed))
                 parsedGuids.Add(parsed);
             else
                 invalidSegments.Add(segment);
-        }
 
         if (invalidSegments.Any())
             throw new InvalidEntityParameterFormatException(

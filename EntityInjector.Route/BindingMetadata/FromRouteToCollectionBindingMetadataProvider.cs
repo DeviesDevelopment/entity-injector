@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
 namespace EntityInjector.Route.BindingMetadata;
 
-public abstract class FromRouteToCollectionBindingMetadataProvider<TKey, TValue> : IBindingMetadataProvider, IModelBinder
+public abstract class FromRouteToCollectionBindingMetadataProvider<TKey, TValue> : IBindingMetadataProvider,
+    IModelBinder
     where TKey : IComparable
 {
     public void CreateBindingMetadata(BindingMetadataProviderContext context)
@@ -27,12 +28,14 @@ public abstract class FromRouteToCollectionBindingMetadataProvider<TKey, TValue>
     public async Task BindModelAsync(ModelBindingContext bindingContext)
     {
         if (bindingContext.ModelMetadata is not DefaultModelMetadata metadata)
-            throw new UnexpectedBindingResultException(typeof(DefaultModelMetadata), bindingContext.ModelMetadata?.GetType());
+            throw new UnexpectedBindingResultException(typeof(DefaultModelMetadata),
+                bindingContext.ModelMetadata?.GetType());
 
         var attribute = metadata.Attributes.ParameterAttributes?.OfType<FromRouteToCollectionAttribute>()
             .FirstOrDefault();
         if (attribute == null)
-            throw new MissingEntityAttributeException(bindingContext.FieldName ?? "<unknown>", nameof(FromRouteToCollectionAttribute));
+            throw new MissingEntityAttributeException(bindingContext.FieldName ?? "<unknown>",
+                nameof(FromRouteToCollectionAttribute));
 
         var modelType = metadata.ElementMetadata?.ModelType ?? metadata.ModelType.GetGenericArguments().First();
         var ids = GetIds(bindingContext.ActionContext, attribute.ArgumentName);
@@ -66,7 +69,8 @@ public abstract class FromRouteToCollectionBindingMetadataProvider<TKey, TValue>
 
         var method = receiver.GetType().GetMethod(nameof(IBindingModelDataReceiver<TKey, TValue>.GetByKeys));
         if (method == null)
-            throw new BindingReceiverContractException(nameof(IBindingModelDataReceiver<TKey, TValue>.GetByKeys), receiver.GetType());
+            throw new BindingReceiverContractException(nameof(IBindingModelDataReceiver<TKey, TValue>.GetByKeys),
+                receiver.GetType());
 
         var parameters = new object?[] { ids, context.HttpContext, metaData };
         var taskObj = method.Invoke(receiver, parameters);

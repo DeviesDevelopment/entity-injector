@@ -29,11 +29,13 @@ public abstract class FromRouteToEntityBindingMetadataProvider<TKey, TValue> : I
     public async Task BindModelAsync(ModelBindingContext bindingContext)
     {
         if (bindingContext.ModelMetadata is not DefaultModelMetadata metadata)
-            throw new UnexpectedBindingResultException(typeof(DefaultModelMetadata), bindingContext.ModelMetadata?.GetType());
+            throw new UnexpectedBindingResultException(typeof(DefaultModelMetadata),
+                bindingContext.ModelMetadata?.GetType());
 
         var attribute = metadata.Attributes.ParameterAttributes?.OfType<FromRouteToEntityAttribute>().FirstOrDefault();
         if (attribute == null)
-            throw new MissingEntityAttributeException(bindingContext.FieldName ?? "unknown", nameof(FromRouteToEntityAttribute));
+            throw new MissingEntityAttributeException(bindingContext.FieldName ?? "unknown",
+                nameof(FromRouteToEntityAttribute));
 
         var id = GetId(bindingContext.ActionContext, attribute.ArgumentName);
         var dataType = metadata.ModelType;
@@ -62,7 +64,8 @@ public abstract class FromRouteToEntityBindingMetadataProvider<TKey, TValue> : I
 
         var method = receiver.GetType().GetMethod(nameof(IBindingModelDataReceiver<TKey, TValue>.GetByKey));
         if (method == null)
-            throw new BindingReceiverContractException(nameof(IBindingModelDataReceiver<TKey, TValue>.GetByKey), receiver.GetType());
+            throw new BindingReceiverContractException(nameof(IBindingModelDataReceiver<TKey, TValue>.GetByKey),
+                receiver.GetType());
 
         var parameters = new object?[] { id, context.HttpContext, metaData };
         var taskObj = method.Invoke(receiver, parameters);
@@ -80,7 +83,7 @@ public abstract class FromRouteToEntityBindingMetadataProvider<TKey, TValue> : I
 
         if (result is null)
             return default;
-        
+
         if (result is not TValue typedResult)
             throw new UnexpectedBindingResultException(typeof(TValue), result?.GetType());
 

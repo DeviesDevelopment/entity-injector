@@ -1,4 +1,3 @@
-using System.Reflection;
 using EntityInjector.Core.Exceptions;
 using EntityInjector.Route.Attributes;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
@@ -22,10 +21,7 @@ public class FromRouteToEntityOperationFilter : IOperationFilter
         {
             var parameter = operation.Parameters
                 .FirstOrDefault(p => string.Equals(p.Name, parameterToHide.Name, StringComparison.Ordinal));
-            if (parameter != null)
-            {
-                operation.Parameters.Remove(parameter);
-            }
+            if (parameter != null) operation.Parameters.Remove(parameter);
         }
 
         // Add OpenAPI responses for known EntityBindingException types
@@ -36,7 +32,7 @@ public class FromRouteToEntityOperationFilter : IOperationFilter
                         t.IsClass &&
                         t.GetInterfaces().Contains(typeof(IExceptionMetadata)))
             .ToList();
-        
+
         foreach (var type in types)
         {
             if (Activator.CreateInstance(type) is not IExceptionMetadata instance)
@@ -44,11 +40,7 @@ public class FromRouteToEntityOperationFilter : IOperationFilter
 
             var key = instance.StatusCode.ToString();
             if (!operation.Responses.ContainsKey(key))
-            {
                 operation.Responses.Add(key, new OpenApiResponse { Description = instance.DefaultDescription });
-            }
         }
-
-
     }
 }

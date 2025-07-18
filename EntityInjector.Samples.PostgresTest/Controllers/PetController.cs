@@ -26,7 +26,7 @@ public class PetController : ControllerBase
                 }
         });
     }
-    
+
     [HttpPost("bulk")]
     public ActionResult<List<PetDto>> FakeCreateBulk([FromBody] List<PetModel> pets)
     {
@@ -38,7 +38,7 @@ public class PetController : ControllerBase
             Owner = p.Owner
         }).ToList();
     }
-    
+
     [HttpPost("by-name")]
     public ActionResult<Dictionary<string, PetDto>> FakeCreateByName([FromBody] Dictionary<string, PetModel> petsByName)
     {
@@ -54,7 +54,7 @@ public class PetController : ControllerBase
 
         return Ok(result);
     }
-    
+
     [HttpPost("nullable")]
     public ActionResult<PetDto> PostNullableOwner([FromBody] PetModelWithNullableOwner model)
     {

@@ -17,7 +17,8 @@ public class IntEntityBindingMetadataProvider<TValue> : FromRouteToEntityBinding
         {
             int g => g,
             string s => int.Parse(s),
-            _ => throw new InvalidEntityParameterFormatException(argumentName, routeValue.GetType(), routeValue.GetType())
+            _ => throw new InvalidEntityParameterFormatException(argumentName, routeValue.GetType(),
+                routeValue.GetType())
         };
     }
 }

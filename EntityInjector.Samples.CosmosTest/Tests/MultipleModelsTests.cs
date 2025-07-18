@@ -21,11 +21,12 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
 {
     private readonly HttpClient _client;
     private readonly CosmosTestFixture _fixture;
+
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
-    
+
     public CosmosMultipleModelsTests(CosmosTestFixture fixture)
     {
         var builder = new WebHostBuilder()
@@ -89,7 +90,7 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
         return products;
     }
 
-    [RetryFact(maxRetries: 10, delayBetweenRetriesMs: 1000)]
+    [RetryFact(10, 1000)]
     public async Task CanBindFromRouteToUserEntityViaGuid()
     {
         var users = await GetSeededUsersAsync();
@@ -106,7 +107,7 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
         Assert.Equal(expectedUser.Age, result.Age);
     }
 
-    [RetryFact(maxRetries: 10, delayBetweenRetriesMs: 1000)]
+    [RetryFact(10, 1000)]
     public async Task CanBindFromRouteToProductEntityViaInt()
     {
         var products = await GetSeededProductsAsync();
@@ -123,7 +124,7 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
         Assert.Equal(expectedProduct.Price, result.Price);
     }
 
-    [RetryFact(maxRetries: 10, delayBetweenRetriesMs: 1000)]
+    [RetryFact(10, 1000)]
     public async Task CanFetchMultipleUsersByHttpRequest()
     {
         var users = (await GetSeededUsersAsync()).Take(2).ToList();
@@ -147,7 +148,7 @@ public class CosmosMultipleModelsTests : IClassFixture<CosmosTestFixture>
         }
     }
 
-    [RetryFact(maxRetries: 10, delayBetweenRetriesMs: 1000)]
+    [RetryFact(10, 1000)]
     public async Task CanFetchMultipleProductsByHttpRequest()
     {
         var products = (await GetSeededProductsAsync()).Take(2).ToList();

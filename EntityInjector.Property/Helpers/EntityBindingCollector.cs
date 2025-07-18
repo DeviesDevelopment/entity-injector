@@ -60,11 +60,9 @@ public static class EntityBindingCollector
                     BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
                 if (idProp == null)
-                {
                     throw new MissingEntityAttributeException(
                         prop.Name,
                         $"Expected property '{attr.PropertyName}' to exist on '{prop.DeclaringType?.Name}' for attribute on '{prop.Name}");
-                }
 
                 var idValue = idProp.GetValue(currentObject);
                 var ids = ExtractIds<TKey>(idValue);
@@ -103,18 +101,14 @@ public static class EntityBindingCollector
         else if (idValue is IEnumerable enumerable && !(idValue is string))
         {
             foreach (var item in enumerable)
-            {
                 if (item is TKey tk)
                     result.Add(tk);
-            }
         }
         else if (idValue is IDictionary dict)
         {
             foreach (var key in dict.Keys)
-            {
                 if (key is TKey tk)
                     result.Add(tk);
-            }
         }
 
         return result;

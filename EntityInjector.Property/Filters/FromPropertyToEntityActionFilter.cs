@@ -14,6 +14,52 @@ public abstract class FromPropertyToEntityActionFilter<TKey>(
     ILogger<FromPropertyToEntityActionFilter<TKey>> logger)
     : IAsyncActionFilter
 {
+    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    {
+        if (context.ActionArguments == null || context.ActionArguments.Count == 0)
+        {
+            await next();
+            return;
+        }
+
+        var toProcess = EntityBindingCollector.Collect<TKey>(context.ActionArguments.Values, context.ModelState);
+
+        var groupedByType = toProcess
+            .GroupBy(info => (info.EntityType,
+                string.Join("&", info.MetaData.OrderBy(x => x.Key).Select(x => $"{x.Key}={x.Value}"))))
+            .Select(g => new { g.Key.EntityType, g.First().MetaData, Bindings = g.ToList() })
+            .ToList();
+
+        foreach (var group in groupedByType)
+        {
+            var allIds = group.Bindings.SelectMany(b => b.Ids).Distinct().ToList();
+            if (allIds.Count == 0) continue;
+
+            IDictionary? fetchedEntities;
+            try
+            {
+                fetchedEntities = await GetEntitiesAsync(allIds, context.HttpContext, group.EntityType, group.MetaData);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error fetching entities for type {TypeName}", group.EntityType.Name);
+                continue;
+            }
+
+            foreach (var binding in group.Bindings)
+                EntityPopulator.Populate(
+                    binding.TargetObject,
+                    binding.TargetProperty,
+                    binding.EntityType,
+                    binding.Ids.Cast<object?>().ToList(),
+                    fetchedEntities,
+                    context.ModelState,
+                    binding.MetaData);
+        }
+
+        await next();
+    }
+
     protected abstract TKey ConvertToKey(object rawValue);
 
     protected abstract TKey GetDefaultValueForNull();
@@ -37,7 +83,6 @@ public abstract class FromPropertyToEntityActionFilter<TKey>(
         var isMarkedAsNullable = NullableReflectionHelper.IsNullable(propInfo);
 
         foreach (var item in listData)
-        {
             if (item == null)
             {
                 if (!isMarkedAsNullable)
@@ -49,59 +94,8 @@ public abstract class FromPropertyToEntityActionFilter<TKey>(
             {
                 ids.Add(ConvertToKey(item));
             }
-        }
 
         return ids;
-    }
-
-    public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
-    {
-        if (context.ActionArguments == null || context.ActionArguments.Count == 0)
-        {
-            await next();
-            return;
-        }
-
-        var toProcess = EntityBindingCollector.Collect<TKey>(context.ActionArguments.Values, context.ModelState);
-
-        var groupedByType = toProcess
-            .GroupBy(info => (info.EntityType, string.Join("&", info.MetaData.OrderBy(x => x.Key).Select(x => $"{x.Key}={x.Value}"))))
-            .Select(g => new { EntityType = g.Key.EntityType, MetaData = g.First().MetaData, Bindings = g.ToList() })
-            .ToList();
-
-        foreach (var group in groupedByType)
-        {
-            var allIds = group.Bindings.SelectMany(b => b.Ids).Distinct().ToList();
-            if (allIds.Count == 0)
-            {
-                continue;
-            }
-
-            IDictionary? fetchedEntities;
-            try
-            {
-                fetchedEntities = await GetEntitiesAsync(allIds, context.HttpContext, group.EntityType, group.MetaData);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error fetching entities for type {TypeName}", group.EntityType.Name);
-                continue;
-            }
-
-            foreach (var binding in group.Bindings)
-            {
-                EntityPopulator.Populate(
-                    binding.TargetObject,
-                    binding.TargetProperty,
-                    binding.EntityType,
-                    binding.Ids.Cast<object?>().ToList(),
-                    fetchedEntities,
-                    context.ModelState,
-                    binding.MetaData);
-            }
-        }
-
-        await next();
     }
 
     private async Task<IDictionary?> GetEntitiesAsync(
@@ -122,8 +116,10 @@ public abstract class FromPropertyToEntityActionFilter<TKey>(
         var method = receiver.GetType().GetMethod(nameof(IBindingModelDataReceiver<int, int>.GetByKeys));
         if (method == null)
         {
-            logger.LogError("Expected method GetByKeys not found on receiver type {ReceiverType}", receiver.GetType().Name);
-            throw new BindingReceiverContractException(nameof(IBindingModelDataReceiver<TKey, object>.GetByKeys), receiver.GetType());
+            logger.LogError("Expected method GetByKeys not found on receiver type {ReceiverType}",
+                receiver.GetType().Name);
+            throw new BindingReceiverContractException(nameof(IBindingModelDataReceiver<TKey, object>.GetByKeys),
+                receiver.GetType());
         }
 
         var parameters = new object?[] { ids, context, metaData };
@@ -153,5 +149,4 @@ public abstract class FromPropertyToEntityActionFilter<TKey>(
 
         return dict;
     }
-
 }

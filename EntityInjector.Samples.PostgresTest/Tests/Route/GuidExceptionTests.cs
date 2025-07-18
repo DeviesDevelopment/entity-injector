@@ -23,11 +23,12 @@ public class GuidExceptionTests : IClassFixture<PostgresTestFixture>
 {
     private readonly HttpClient _client;
     private readonly PostgresTestFixture _fixture;
+
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
-    
+
     public GuidExceptionTests(PostgresTestFixture fixture)
     {
         var builder = new WebHostBuilder()
@@ -50,8 +51,7 @@ public class GuidExceptionTests : IClassFixture<PostgresTestFixture>
                 services.PostConfigureAll<SwaggerGenOptions>(o =>
                 {
                     o.OperationFilter<FromRouteToEntityOperationFilter>();
-                });                
-
+                });
             })
             .Configure(app =>
             {
@@ -64,7 +64,7 @@ public class GuidExceptionTests : IClassFixture<PostgresTestFixture>
         _client = server.CreateClient();
         _fixture = fixture;
     }
-    
+
     [Fact]
     public async Task ReturnsBadRequestWhenGuidRouteParameterIsMalformed()
     {
@@ -76,7 +76,7 @@ public class GuidExceptionTests : IClassFixture<PostgresTestFixture>
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
         var expected = new InvalidEntityParameterFormatException("id", typeof(Guid), typeof(string));
-    
+
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);
         Assert.Contains("id", problem.Detail);

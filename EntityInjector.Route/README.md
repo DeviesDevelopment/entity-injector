@@ -36,8 +36,10 @@ services.AddRouteBinding();
 app.UseRouteBinding();
 ```
 
-You may also opt to configure your own `ProblemDetailsFactory` to customize your exception logic (to for example hide error messages). 
+You may also opt to configure your own `ProblemDetailsFactory` to customize your exception logic (to for example hide
+error messages).
 In such a case avoid `app.UseRouteBinding()` and instead add your own:
+
 ```csharp
 services.TryAddSingleton<IRouteBindingProblemDetailsFactory, YourCustomRouteBindingProblemDetailsFactory>();
 ```
@@ -66,12 +68,14 @@ See the Sample projects for demonstration on how to:
 
 ## Extensibility
 
-You can extend `FromRouteToEntityBindingMetadataProvider` or `FromRouteToCollectionBindingMetadataProvider` to support custom key types beyond what is included.
+You can extend `FromRouteToEntityBindingMetadataProvider` or `FromRouteToCollectionBindingMetadataProvider` to support
+custom key types beyond what is included.
 
 You can also configure your own exception management as described earlier.
 
 ## Limitations
 
 Only one key type is supported per entity type to avoid ambiguity during binding.  
-If multiple keys are needed, you can create a custom attribute extending `FromRouteToEntityAttribute` with a different name.  
+If multiple keys are needed, you can create a custom attribute extending `FromRouteToEntityAttribute` with a different
+name.  
 This is technically possible but not recommended due to potential for confusion.

@@ -21,11 +21,12 @@ public class StringKeyTests : IClassFixture<CosmosTestFixture>
 {
     private readonly HttpClient _client;
     private readonly CosmosTestFixture _fixture;
+
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
-    
+
     public StringKeyTests(CosmosTestFixture fixture)
     {
         var builder = new WebHostBuilder()
@@ -56,14 +57,14 @@ public class StringKeyTests : IClassFixture<CosmosTestFixture>
         _fixture = fixture;
     }
 
-    [RetryFact(maxRetries: 10, delayBetweenRetriesMs: 1000)]
+    [RetryFact(10, 1000)]
     public async Task CanBindFromRouteToUserEntityViaString()
     {
         // Get a seeded user from Cosmos DB
         var iterator = _fixture.UsersContainer.GetItemLinqQueryable<User>(true).ToFeedIterator();
         var response = await iterator.ReadNextAsync();
         var expectedUser = response.Resource.FirstOrDefault();
-        
+
         Assert.NotNull(expectedUser);
 
         var userId = expectedUser!.Id.ToString();
@@ -78,12 +79,12 @@ public class StringKeyTests : IClassFixture<CosmosTestFixture>
         Assert.Equal(expectedUser.Name, result.Name);
     }
 
-    [RetryFact(maxRetries: 10, delayBetweenRetriesMs: 1000)]
+    [RetryFact(10, 1000)]
     public async Task CanFetchMultipleUsersByHttpRequest()
     {
         var iterator = _fixture.UsersContainer.GetItemLinqQueryable<User>(true).ToFeedIterator();
         var users = new List<User>();
-        
+
         while (iterator.HasMoreResults && users.Count < 2)
         {
             var response = await iterator.ReadNextAsync();

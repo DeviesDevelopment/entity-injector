@@ -1,6 +1,3 @@
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 using EntityInjector.Property.Attributes;
 using EntityInjector.Samples.PostgresTest.Models.Entities;
 
@@ -31,7 +28,6 @@ public class PetModelWithNullableOwner
     [FromPropertyToEntity(nameof(OwnerId))]
     public User? Owner { get; set; }
 }
-
 
 public class PetDto
 {

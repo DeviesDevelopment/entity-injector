@@ -1,5 +1,4 @@
 using EntityInjector.Route.Attributes;
-using EntityInjector.Samples.PostgresTest.Models;
 using EntityInjector.Samples.PostgresTest.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 

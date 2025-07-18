@@ -9,11 +9,13 @@ public class EntityBindingExceptionMiddleware(
     ILogger<EntityBindingExceptionMiddleware> logger,
     IEntityBindingProblemDetailsFactory? problemDetailsFactory = null)
 {
-    private readonly IEntityBindingProblemDetailsFactory _problemDetailsFactory = problemDetailsFactory ?? new DefaultEntityBindingProblemDetailsFactory();
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
+
+    private readonly IEntityBindingProblemDetailsFactory _problemDetailsFactory =
+        problemDetailsFactory ?? new DefaultEntityBindingProblemDetailsFactory();
 
     public async Task Invoke(HttpContext context)
     {
@@ -34,5 +36,4 @@ public class EntityBindingExceptionMiddleware(
             await context.Response.WriteAsync(json);
         }
     }
-
 }
