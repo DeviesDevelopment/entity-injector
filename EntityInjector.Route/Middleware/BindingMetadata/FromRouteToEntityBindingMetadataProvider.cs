@@ -18,9 +18,9 @@ public abstract class FromRouteToEntityBindingMetadataProvider<TKey, TValue> : I
         if (fromRouteParameterAttributes.Count == 0) return;
 
         var targetType = context.Key.ModelType;
+        // Skip configuration if no binding has been created for TValue
         if (!SupportsType(targetType))
             return;
-
 
         context.BindingMetadata.BindingSource = BindingSource.Custom;
         context.BindingMetadata.BinderType = GetType();
@@ -29,20 +29,18 @@ public abstract class FromRouteToEntityBindingMetadataProvider<TKey, TValue> : I
     public async Task BindModelAsync(ModelBindingContext bindingContext)
     {
         if (bindingContext.ModelMetadata is not DefaultModelMetadata metadata)
-            throw new InternalServerErrorException(
-                $"{nameof(bindingContext.ModelMetadata)} is not {nameof(DefaultModelMetadata)}");
+            throw new UnexpectedBindingResultException(typeof(DefaultModelMetadata), bindingContext.ModelMetadata?.GetType());
 
         var attribute = metadata.Attributes.ParameterAttributes?.OfType<FromRouteToEntityAttribute>().FirstOrDefault();
         if (attribute == null)
-            throw new InternalServerErrorException(
-                $"Missing {nameof(FromRouteToEntityAttribute)} on action parameter.");
+            throw new MissingRouteAttributeException(bindingContext.FieldName ?? "unknown", nameof(FromRouteToEntityAttribute));
 
         var id = GetId(bindingContext.ActionContext, attribute.ArgumentName);
         var dataType = metadata.ModelType;
 
         var entity = await GetEntityAsync(id, bindingContext.ActionContext, dataType, attribute.MetaData);
-        if (entity == null)
-            throw new NotFoundException($"Route value '{attribute.ArgumentName}' - No {dataType.Name} with Id: {id}");
+        if (entity is null)
+            throw new RouteEntityNotFoundException(dataType.Name, id);
 
         bindingContext.Result = ModelBindingResult.Success(entity);
     }
@@ -60,29 +58,31 @@ public abstract class FromRouteToEntityBindingMetadataProvider<TKey, TValue> : I
         var receiverType = typeof(IBindingModelDataReceiver<,>).MakeGenericType(typeof(TKey), dataType);
         var receiver = context.HttpContext.RequestServices.GetService(receiverType);
         if (receiver == null)
-            throw new InternalServerErrorException($"No receiver registered for type {receiverType.Name}");
+            throw new BindingReceiverNotRegisteredException(receiverType);
 
         var method = receiver.GetType().GetMethod(nameof(IBindingModelDataReceiver<TKey, TValue>.GetByKey));
         if (method == null)
-            throw new InternalServerErrorException(
-                $"Method '{nameof(IBindingModelDataReceiver<TKey, TValue>.GetByKey)}' not found on {receiver.GetType().Name}");
+            throw new BindingReceiverContractException(nameof(IBindingModelDataReceiver<TKey, TValue>.GetByKey), receiver.GetType());
 
         var parameters = new object?[] { id, context.HttpContext, metaData };
         var taskObj = method.Invoke(receiver, parameters);
 
         if (taskObj is not Task task)
-            throw new InternalServerErrorException("Expected a Task return type from GetByKey");
+            throw new UnexpectedBindingResultException(typeof(Task), taskObj?.GetType());
 
         await task;
 
         var resultProperty = task.GetType().GetProperty("Result");
-        if (resultProperty == null) throw new InternalServerErrorException("Result property missing on resolved Task");
+        if (resultProperty == null)
+            throw new UnexpectedBindingResultException(typeof(object), null);
 
         var result = resultProperty.GetValue(task);
 
+        if (result is null)
+            return default;
+        
         if (result is not TValue typedResult)
-            throw new InternalServerErrorException(
-                $"Expected result of type {typeof(TValue).Name}, but got {result?.GetType().Name ?? "null"}");
+            throw new UnexpectedBindingResultException(typeof(TValue), result?.GetType());
 
         return typedResult;
     }

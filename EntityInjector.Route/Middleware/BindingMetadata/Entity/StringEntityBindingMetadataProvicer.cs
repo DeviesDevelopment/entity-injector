@@ -11,15 +11,13 @@ public class StringEntityBindingMetadataProvider<TValue> : FromRouteToEntityBind
         var routeValue = context.HttpContext.GetRouteValue(argumentName);
 
         if (routeValue == null)
-            throw new InternalServerErrorException(
-                $"Route parameter '{argumentName}' was not found. Ensure it is correctly specified in the route.");
+            throw new MissingRouteParameterException(argumentName);
 
         return routeValue switch
         {
             string s when !string.IsNullOrWhiteSpace(s) => s,
             Guid g => g.ToString(),
-            _ => throw new InternalServerErrorException(
-                $"Route parameter '{argumentName}' must be a non-empty string or a Guid, but received type '{routeValue.GetType().Name}'.")
+            _ => throw new InvalidRouteParameterFormatException(argumentName, routeValue.GetType(), routeValue.GetType())
         };
     }
 }

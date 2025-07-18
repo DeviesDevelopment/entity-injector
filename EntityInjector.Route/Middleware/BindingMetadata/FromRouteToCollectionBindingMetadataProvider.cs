@@ -7,8 +7,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
 
 namespace EntityInjector.Route.Middleware.BindingMetadata;
 
-public abstract class FromRouteToCollectionBindingMetadataProvider<TKey, TValue> : IBindingMetadataProvider,
-    IModelBinder
+public abstract class FromRouteToCollectionBindingMetadataProvider<TKey, TValue> : IBindingMetadataProvider, IModelBinder
     where TKey : IComparable
 {
     public void CreateBindingMetadata(BindingMetadataProviderContext context)
@@ -17,6 +16,7 @@ public abstract class FromRouteToCollectionBindingMetadataProvider<TKey, TValue>
         if (attributes.Count == 0) return;
 
         var targetType = context.Key.ModelType;
+        // Skip configuration if no binding has been created for TValue
         if (!SupportsType(targetType))
             return;
 
@@ -27,14 +27,12 @@ public abstract class FromRouteToCollectionBindingMetadataProvider<TKey, TValue>
     public async Task BindModelAsync(ModelBindingContext bindingContext)
     {
         if (bindingContext.ModelMetadata is not DefaultModelMetadata metadata)
-            throw new InternalServerErrorException(
-                $"{nameof(bindingContext.ModelMetadata)} is not {nameof(DefaultModelMetadata)}");
+            throw new UnexpectedBindingResultException(typeof(DefaultModelMetadata), bindingContext.ModelMetadata?.GetType());
 
         var attribute = metadata.Attributes.ParameterAttributes?.OfType<FromRouteToCollectionAttribute>()
             .FirstOrDefault();
         if (attribute == null)
-            throw new InternalServerErrorException(
-                $"Missing {nameof(FromRouteToCollectionAttribute)} on action parameter.");
+            throw new MissingRouteAttributeException(bindingContext.FieldName ?? "<unknown>", nameof(FromRouteToCollectionAttribute));
 
         var modelType = metadata.ElementMetadata?.ModelType ?? metadata.ModelType.GetGenericArguments().First();
         var ids = GetIds(bindingContext.ActionContext, attribute.ArgumentName);
@@ -59,35 +57,35 @@ public abstract class FromRouteToCollectionBindingMetadataProvider<TKey, TValue>
         Dictionary<string, string> metaData)
     {
         if (ids == null || ids.Count == 0)
-            throw new InternalServerErrorException("No IDs provided for batch resolution.");
+            throw new UnexpectedBindingResultException(typeof(List<TKey>), null);
 
         var receiverType = typeof(IBindingModelDataReceiver<,>).MakeGenericType(typeof(TKey), dataType);
         var receiver = context.HttpContext.RequestServices.GetService(receiverType);
         if (receiver == null)
-            throw new InternalServerErrorException($"No receiver registered for type {receiverType.Name}");
+            throw new BindingReceiverNotRegisteredException(receiverType);
 
         var method = receiver.GetType().GetMethod(nameof(IBindingModelDataReceiver<TKey, TValue>.GetByKeys));
         if (method == null)
-            throw new InternalServerErrorException(
-                $"Method '{nameof(IBindingModelDataReceiver<TKey, TValue>.GetByKeys)}' not found on {receiver.GetType().Name}");
+            throw new BindingReceiverContractException(nameof(IBindingModelDataReceiver<TKey, TValue>.GetByKeys), receiver.GetType());
 
         var parameters = new object?[] { ids, context.HttpContext, metaData };
         var taskObj = method.Invoke(receiver, parameters);
 
         if (taskObj is not Task task)
-            throw new InternalServerErrorException("Expected a Task return type from GetByKeys");
+            throw new UnexpectedBindingResultException(typeof(Task), taskObj?.GetType());
 
         await task;
 
         var resultProperty = task.GetType().GetProperty("Result");
-        if (resultProperty == null) throw new InternalServerErrorException("Result property missing on resolved Task");
+        if (resultProperty == null)
+            throw new UnexpectedBindingResultException(typeof(Dictionary<TKey, TValue?>), null);
 
-        if (resultProperty.GetValue(task) is not Dictionary<TKey, TValue?> result)
-            throw new InternalServerErrorException("Result was not of expected Dictionary<TKey, TValue?> type.");
+        var value = resultProperty.GetValue(task);
+        if (value is not Dictionary<TKey, TValue?> result)
+            throw new UnexpectedBindingResultException(typeof(Dictionary<TKey, TValue?>), value?.GetType());
 
         return result;
     }
-
 
     protected abstract List<TKey> GetIds(ActionContext context, string argumentName);
 }
