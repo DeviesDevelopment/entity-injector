@@ -1,6 +1,7 @@
 # EntityInjector.Samples.PostgresTest
 
-This sample demonstrates how to use EntityInjector with a Postgres database using Entity Framework Core and TestContainers.  
+This sample demonstrates how to use EntityInjector with a Postgres database using Entity Framework Core and
+TestContainers.  
 It shows how to bind route parameters directly to entities using dependency injection.
 
 ## Prerequisites

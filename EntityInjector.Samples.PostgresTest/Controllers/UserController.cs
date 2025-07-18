@@ -1,5 +1,5 @@
-using EntityInjector.Route.Middleware.Attributes;
-using EntityInjector.Samples.PostgresTest.Models;
+using EntityInjector.Route.Attributes;
+using EntityInjector.Samples.PostgresTest.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EntityInjector.Samples.PostgresTest.Controllers;

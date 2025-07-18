@@ -41,7 +41,8 @@ CREATE TABLE IF NOT EXISTS products
 -- Insert sample data
 INSERT INTO users (name, age)
 VALUES ('Alice', 20),
-       ('Bob', 18);
+       ('Bob', 18),
+       ('Carol', 25);
 
 INSERT INTO products (name, price)
 VALUES ('Standard Widget', 9.99),

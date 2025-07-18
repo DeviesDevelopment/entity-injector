@@ -1,5 +1,5 @@
-using EntityInjector.Route.Middleware.Attributes;
-using EntityInjector.Samples.PostgresTest.Models;
+using EntityInjector.Route.Attributes;
+using EntityInjector.Samples.PostgresTest.Models.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EntityInjector.Samples.PostgresTest.Controllers;
@@ -14,7 +14,7 @@ public class InvalidUserController : ControllerBase
     {
         return Ok(new { user.Id, user.Name, user.Age });
     }
-    
+
     // Used to ensure correct status code when invalid parameter is inserted into id
     [HttpGet("batch/{ids?}")]
     public ActionResult<IEnumerable<User>> GetManyMaybe([FromRouteToCollection("ids")] List<User> users)

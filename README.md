@@ -11,7 +11,7 @@ in a clean and dependency-injected way.
 ## Packages
 
 | Package              | NuGet                                                                                                                | Description                                         |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+|----------------------|----------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------|
 | EntityInjector.Route | [![NuGet](https://img.shields.io/nuget/v/EntityInjector.Route)](https://www.nuget.org/packages/EntityInjector.Route) | Bind route parameters directly to database entities |
 
 ## Samples

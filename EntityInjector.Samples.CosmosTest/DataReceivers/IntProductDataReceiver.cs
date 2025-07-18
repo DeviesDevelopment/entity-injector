@@ -1,4 +1,4 @@
-using EntityInjector.Route.Interfaces;
+using EntityInjector.Core.Interfaces;
 using EntityInjector.Samples.CosmosTest.Models;
 using EntityInjector.Samples.CosmosTest.Setup;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +10,7 @@ namespace EntityInjector.Samples.CosmosTest.DataReceivers;
 public class IntProductDataReceiver(CosmosContainer<Product> cosmosContainer) : IBindingModelDataReceiver<int, Product>
 {
     private readonly Container _container = cosmosContainer.Container;
-    
+
     public async Task<Product?> GetByKey(int key, HttpContext httpContext, Dictionary<string, string> metaData)
     {
         var query = _container.GetItemLinqQueryable<Product>(true)
@@ -26,7 +26,8 @@ public class IntProductDataReceiver(CosmosContainer<Product> cosmosContainer) : 
         return null;
     }
 
-    public async Task<Dictionary<int, Product>> GetByKeys(List<int> keys, HttpContext httpContext, Dictionary<string, string> metaData)
+    public async Task<Dictionary<int, Product>> GetByKeys(List<int> keys, HttpContext httpContext,
+        Dictionary<string, string> metaData)
     {
         var stringKeys = keys.Select(k => k.ToString()).ToList();
 
@@ -38,10 +39,7 @@ public class IntProductDataReceiver(CosmosContainer<Product> cosmosContainer) : 
         while (query.HasMoreResults)
         {
             var response = await query.ReadNextAsync();
-            foreach (var product in response.Resource)
-            {
-                result[int.Parse(product.Id)] = product;
-            }
+            foreach (var product in response.Resource) result[int.Parse(product.Id)] = product;
         }
 
         return result;

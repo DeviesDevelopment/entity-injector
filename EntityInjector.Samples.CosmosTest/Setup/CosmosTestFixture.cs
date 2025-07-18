@@ -7,11 +7,12 @@ namespace EntityInjector.Samples.CosmosTest.Setup;
 
 public class CosmosTestFixture : IAsyncLifetime
 {
+    private const string AccountKey =
+        "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+
     public CosmosClient Client { get; private set; } = default!;
     public Container UsersContainer { get; private set; } = default!;
     public Container ProductsContainer { get; private set; } = default!;
-
-    private const string AccountKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
 
     public async Task InitializeAsync()
     {
@@ -21,8 +22,8 @@ public class CosmosTestFixture : IAsyncLifetime
             ConnectionMode = ConnectionMode.Gateway,
             HttpClientFactory = () => new HttpClient(new HttpClientHandler
             {
-                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-                
+                ServerCertificateCustomValidationCallback =
+                    HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
             })
         });
 
@@ -30,8 +31,14 @@ public class CosmosTestFixture : IAsyncLifetime
 
         UsersContainer = await db.Database.CreateContainerIfNotExistsAsync("Users", "/id");
         ProductsContainer = await db.Database.CreateContainerIfNotExistsAsync("Products", "/id");
-        
+
         await SeedDataAsync();
+    }
+
+    public Task DisposeAsync()
+    {
+        Client?.Dispose();
+        return Task.CompletedTask;
     }
 
     private async Task SeedDataAsync()
@@ -43,10 +50,13 @@ public class CosmosTestFixture : IAsyncLifetime
         {
             var user1 = new User { Id = Guid.NewGuid(), Name = "Alice", Age = 20 };
             var user2 = new User { Id = Guid.NewGuid(), Name = "Bob", Age = 18 };
+            var user3 = new User { Id = Guid.NewGuid(), Name = "Carol", Age = 25 };
 
             await UsersContainer.UpsertItemAsync(user1, new PartitionKey(user1.Id.ToString()));
             await UsersContainer.UpsertItemAsync(user2, new PartitionKey(user2.Id.ToString()));
+            await UsersContainer.UpsertItemAsync(user3, new PartitionKey(user3.Id.ToString()));
         }
+
         iterator = ProductsContainer.GetItemQueryIterator<dynamic>("SELECT TOP 1 c.id FROM c");
         response = await iterator.ReadNextAsync();
 
@@ -58,11 +68,5 @@ public class CosmosTestFixture : IAsyncLifetime
             await ProductsContainer.UpsertItemAsync(product1, new PartitionKey(product1.Id));
             await ProductsContainer.UpsertItemAsync(product2, new PartitionKey(product2.Id));
         }
-    }
-
-    public Task DisposeAsync()
-    {
-        Client?.Dispose();
-        return Task.CompletedTask;
     }
 }

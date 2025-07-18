@@ -15,6 +15,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityInjector.Samples.Post
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityInjector.Samples.CosmosTest", "EntityInjector.Samples.CosmosTest\EntityInjector.Samples.CosmosTest.csproj", "{D55F0082-CF85-4511-B006-884EDA045863}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityInjector.Property", "EntityInjector.Property\EntityInjector.Property.csproj", "{9FBEEA0B-DFF7-466C-80C9-F74A75FB2C08}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityInjector.Core", "EntityInjector.Core\EntityInjector.Core.csproj", "{FFAC6CC6-FF2C-4514-A1E5-056901CAA1D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,5 +37,13 @@ Global
 		{D55F0082-CF85-4511-B006-884EDA045863}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D55F0082-CF85-4511-B006-884EDA045863}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D55F0082-CF85-4511-B006-884EDA045863}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9FBEEA0B-DFF7-466C-80C9-F74A75FB2C08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9FBEEA0B-DFF7-466C-80C9-F74A75FB2C08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9FBEEA0B-DFF7-466C-80C9-F74A75FB2C08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9FBEEA0B-DFF7-466C-80C9-F74A75FB2C08}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFAC6CC6-FF2C-4514-A1E5-056901CAA1D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFAC6CC6-FF2C-4514-A1E5-056901CAA1D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFAC6CC6-FF2C-4514-A1E5-056901CAA1D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFAC6CC6-FF2C-4514-A1E5-056901CAA1D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
