@@ -21,7 +21,7 @@ public IActionResult Create([FromBody] PetModel model)
 }
 ```
 
-Setup
+## Setup
 
 1. Register a DataReceiver that implements `IBindingModelDataReceiver<TKey, TEntity>`. This defines how to fetch entities based on key properties.
 ```csharp
@@ -36,6 +36,42 @@ options.Filters.Add<GuidFromPropertyToEntityActionFilter>();
 Each key type requires a separate action filter inheriting from FromPropertyToEntityActionFilter<TKey>.
 
 3. (Optional) Configure custom exception behavior. The default implementation throws a RouteBindingException if an entity cannot be resolved. You can override this by customizing your data receiver or extending the exception pipeline.
+
+## Attribute Behavior
+
+You can control how missing or unmatched entity references are handled using optional metadata flags in the `[FromPropertyToEntity]` attribute:
+
+### cleanNoMatch
+
+Type: `bool` (as a `string` key in MetaData)
+
+Purpose: Suppresses model validation errors when a referenced ID does not resolve to an entity.
+
+Default behavior (when omitted): A model error is added if an ID has no matching entity.
+
+Usage example:
+```csharp
+[FromPropertyToEntity(nameof(LeadIds), "cleanNoMatch=true")]
+public List<User?> Users { get; set; }
+```
+
+### includeNulls
+
+Type: `bool` (as a `string` key in MetaData)
+
+Purpose: Ensures that for any unmatched or null ID, a null is explicitly added to the target entity, collection or dictionary.
+
+Important:
+
+If both `includeNulls=true` and `cleanNoMatch=true` are specified, includeNulls takes precedence.
+
+This means that null values will be inserted for unmatched IDs, and no model errors will be added, regardless of cleanNoMatch.
+
+Usage example:
+```csharp
+[FromPropertyToEntity(nameof(LeadIds), "cleanNoMatch=true", "includeNulls=true")]
+public List<User?> Users { get; set; }
+```
 
 ## Use Cases for `[FromPropertyToEntity]`
 
