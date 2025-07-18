@@ -17,7 +17,7 @@ using Xunit;
 
 namespace EntityInjector.Samples.PostgresTest.Tests.Property;
 
-public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
+public class PropertyExceptionTests : IClassFixture<PostgresTestFixture>
 {
     private readonly HttpClient _client;
     private readonly PostgresTestFixture _fixture;
@@ -26,7 +26,7 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
         PropertyNameCaseInsensitive = true
     };
 
-    public PropertyToEntityTests(PostgresTestFixture fixture)
+    public PropertyExceptionTests(PostgresTestFixture fixture)
     {
         var builder = new WebHostBuilder()
             .ConfigureServices(services =>
@@ -42,11 +42,12 @@ public class PropertyToEntityTests : IClassFixture<PostgresTestFixture>
                 {
                     options.Filters.Add<GuidFromPropertyToEntityActionFilter>();
                 });
-                
+
                 services.PostConfigureAll<SwaggerGenOptions>(o =>
                 {
                     o.SchemaFilter<FromPropertyToEntitySchemaFilter>();
-                });                
+                });
+
             })
             .Configure(app =>
             {

@@ -5,8 +5,8 @@ using EntityInjector.Core.Exceptions.Middleware;
 using EntityInjector.Core.Interfaces;
 using EntityInjector.Route.BindingMetadata.Collection;
 using EntityInjector.Route.BindingMetadata.Entity;
+using EntityInjector.Route.Filters;
 using EntityInjector.Samples.PostgresTest.DataReceivers;
-using EntityInjector.Samples.PostgresTest.Models;
 using EntityInjector.Samples.PostgresTest.Models.Entities;
 using EntityInjector.Samples.PostgresTest.Setup;
 using Microsoft.AspNetCore.Builder;
@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Xunit;
 
 namespace EntityInjector.Samples.PostgresTest.Tests.Route;
@@ -50,6 +51,11 @@ public class StringExceptionTests : IClassFixture<PostgresTestFixture>
                     // Add Product binding metadata, but omit the receiver on purpose
                     options.ModelMetadataDetailsProviders.Add(new IntEntityBindingMetadataProvider<Product>());
                 });
+                services.PostConfigureAll<SwaggerGenOptions>(o =>
+                {
+                    o.OperationFilter<FromRouteToEntityOperationFilter>();
+                });                
+
             })
             .Configure(app =>
             {

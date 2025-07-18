@@ -4,4 +4,5 @@ public abstract class EntityBindingException(string message, Exception? inner = 
     : Exception(message, inner)
 {
     public abstract int StatusCode { get; }
+    public virtual string? Description => Message;
 }

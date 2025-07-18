@@ -3,8 +3,8 @@ using EntityInjector.Core.Exceptions;
 using EntityInjector.Core.Exceptions.Middleware;
 using EntityInjector.Core.Interfaces;
 using EntityInjector.Route.BindingMetadata.Entity;
+using EntityInjector.Route.Filters;
 using EntityInjector.Samples.PostgresTest.DataReceivers;
-using EntityInjector.Samples.PostgresTest.Models;
 using EntityInjector.Samples.PostgresTest.Models.Entities;
 using EntityInjector.Samples.PostgresTest.Setup;
 using Microsoft.AspNetCore.Builder;
@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Xunit;
 
 namespace EntityInjector.Samples.PostgresTest.Tests.Route;
@@ -50,6 +51,11 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
                     options.ModelMetadataDetailsProviders.Add(new IntEntityBindingMetadataProvider<Product>());
                     
                 });
+                services.PostConfigureAll<SwaggerGenOptions>(o =>
+                {
+                    o.OperationFilter<FromRouteToEntityOperationFilter>();
+                });                
+
             })
             .Configure(app =>
             {

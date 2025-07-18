@@ -2,8 +2,8 @@ using System.Text.Json;
 using EntityInjector.Core.Interfaces;
 using EntityInjector.Route.BindingMetadata.Collection;
 using EntityInjector.Route.BindingMetadata.Entity;
+using EntityInjector.Route.Filters;
 using EntityInjector.Samples.PostgresTest.DataReceivers;
-using EntityInjector.Samples.PostgresTest.Models;
 using EntityInjector.Samples.PostgresTest.Models.Entities;
 using EntityInjector.Samples.PostgresTest.Setup;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using Xunit;
 
 namespace EntityInjector.Samples.PostgresTest.Tests.Route;
@@ -49,6 +50,11 @@ public class MultipleModelsTests : IClassFixture<PostgresTestFixture>
                     options.ModelMetadataDetailsProviders.Add(new IntEntityBindingMetadataProvider<Product>());
                     options.ModelMetadataDetailsProviders.Add(new IntCollectionBindingMetadataProvider<Product>());
                 });
+                services.PostConfigureAll<SwaggerGenOptions>(o =>
+                {
+                    o.OperationFilter<FromRouteToEntityOperationFilter>();
+                });                
+
             })
             .Configure(app =>
             {
