@@ -1,4 +1,4 @@
-using EntityInjector.Route.Interfaces;
+using EntityInjector.Core.Interfaces;
 using EntityInjector.Samples.CosmosTest.Models;
 using EntityInjector.Samples.CosmosTest.Setup;
 using Microsoft.AspNetCore.Http;

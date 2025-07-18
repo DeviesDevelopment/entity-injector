@@ -1,7 +1,7 @@
 using System.Text.Json;
-using EntityInjector.Route.Interfaces;
-using EntityInjector.Route.Middleware.BindingMetadata.Collection;
-using EntityInjector.Route.Middleware.BindingMetadata.Entity;
+using EntityInjector.Core.Interfaces;
+using EntityInjector.Route.BindingMetadata.Collection;
+using EntityInjector.Route.BindingMetadata.Entity;
 using EntityInjector.Samples.CosmosTest.DataReceivers;
 using EntityInjector.Samples.CosmosTest.Models;
 using EntityInjector.Samples.CosmosTest.Setup;

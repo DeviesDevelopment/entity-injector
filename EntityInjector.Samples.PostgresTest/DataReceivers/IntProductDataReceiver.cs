@@ -1,5 +1,6 @@
-using EntityInjector.Route.Interfaces;
+using EntityInjector.Core.Interfaces;
 using EntityInjector.Samples.PostgresTest.Models;
+using EntityInjector.Samples.PostgresTest.Models.Entities;
 using EntityInjector.Samples.PostgresTest.Setup;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;

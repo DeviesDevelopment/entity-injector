@@ -1,12 +1,7 @@
+using EntityInjector.Core.Exceptions;
 using Microsoft.AspNetCore.Http;
 
 namespace EntityInjector.Route.Exceptions;
-
-public abstract class RouteBindingException(string message, Exception? inner = null)
-    : Exception(message, inner)
-{
-    public abstract int StatusCode { get; }
-}
 
 public sealed class RouteEntityNotFoundException(string entityName, object? id)
     : RouteBindingException($"No {entityName} found for ID '{id}'.")

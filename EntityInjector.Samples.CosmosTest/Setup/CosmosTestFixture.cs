@@ -43,9 +43,11 @@ public class CosmosTestFixture : IAsyncLifetime
         {
             var user1 = new User { Id = Guid.NewGuid(), Name = "Alice", Age = 20 };
             var user2 = new User { Id = Guid.NewGuid(), Name = "Bob", Age = 18 };
+            var user3 = new User { Id = Guid.NewGuid(), Name = "Carol", Age = 25 };
 
             await UsersContainer.UpsertItemAsync(user1, new PartitionKey(user1.Id.ToString()));
             await UsersContainer.UpsertItemAsync(user2, new PartitionKey(user2.Id.ToString()));
+            await UsersContainer.UpsertItemAsync(user3, new PartitionKey(user3.Id.ToString()));
         }
         iterator = ProductsContainer.GetItemQueryIterator<dynamic>("SELECT TOP 1 c.id FROM c");
         response = await iterator.ReadNextAsync();
