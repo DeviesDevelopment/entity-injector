@@ -1,4 +1,4 @@
-using EntityInjector.Property.Exceptions;
+using EntityInjector.Core.Exceptions;
 using Microsoft.Extensions.Logging;
 
 namespace EntityInjector.Property.Filters;
@@ -13,7 +13,7 @@ public class StringFromPropertyToEntityActionFilter(
     {
         string a => a,
         Guid g => g.ToString(),
-        _ => throw new InternalServerErrorException("bad mapping")
+        _ => throw new InvalidEntityParameterFormatException("id", typeof(string), rawValue.GetType())
     };
 
     protected override string GetDefaultValueForNull() => "";

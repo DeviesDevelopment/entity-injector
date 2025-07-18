@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Builder;
 
 namespace EntityInjector.Core.Exceptions.Middleware;
 
-public static class RouteBindingApplicationBuilderExtensions
+public static class EntityBindingApplicationBuilderExtensions
 {
     public static IApplicationBuilder UseRouteBinding(this IApplicationBuilder app)
     {
-        return app.UseMiddleware<RouteBindingExceptionMiddleware>();
+        return app.UseMiddleware<EntityBindingExceptionMiddleware>();
     }
 }

@@ -1,6 +1,6 @@
+using EntityInjector.Core.Exceptions;
 using EntityInjector.Core.Interfaces;
 using EntityInjector.Route.Attributes;
-using EntityInjector.Route.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
@@ -32,7 +32,7 @@ public abstract class FromRouteToCollectionBindingMetadataProvider<TKey, TValue>
         var attribute = metadata.Attributes.ParameterAttributes?.OfType<FromRouteToCollectionAttribute>()
             .FirstOrDefault();
         if (attribute == null)
-            throw new MissingRouteAttributeException(bindingContext.FieldName ?? "<unknown>", nameof(FromRouteToCollectionAttribute));
+            throw new MissingEntityAttributeException(bindingContext.FieldName ?? "<unknown>", nameof(FromRouteToCollectionAttribute));
 
         var modelType = metadata.ElementMetadata?.ModelType ?? metadata.ModelType.GetGenericArguments().First();
         var ids = GetIds(bindingContext.ActionContext, attribute.ArgumentName);

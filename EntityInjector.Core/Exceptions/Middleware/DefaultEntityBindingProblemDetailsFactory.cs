@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EntityInjector.Core.Exceptions.Middleware;
 
-public class DefaultRouteBindingProblemDetailsFactory : IRouteBindingProblemDetailsFactory
+public class DefaultEntityBindingProblemDetailsFactory : IEntityBindingProblemDetailsFactory
 {
-    public ProblemDetails Create(HttpContext context, RouteBindingException exception)
+    public ProblemDetails Create(HttpContext context, EntityBindingException exception)
     {
         return new ProblemDetails
         {

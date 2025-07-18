@@ -3,7 +3,6 @@ using EntityInjector.Core.Exceptions;
 using EntityInjector.Core.Exceptions.Middleware;
 using EntityInjector.Core.Interfaces;
 using EntityInjector.Route.BindingMetadata.Entity;
-using EntityInjector.Route.Exceptions;
 using EntityInjector.Samples.PostgresTest.DataReceivers;
 using EntityInjector.Samples.PostgresTest.Models;
 using EntityInjector.Samples.PostgresTest.Models.Entities;
@@ -34,7 +33,7 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
             .ConfigureServices(services =>
             {
                 services.AddSingleton(fixture.DbContext);
-                services.TryAddSingleton<IRouteBindingProblemDetailsFactory, CustomRouteBindingProblemDetailsFactory>();
+                services.TryAddSingleton<IEntityBindingProblemDetailsFactory, CustomEntityBindingProblemDetailsFactory>();
                 
                 // Use only one type of FromRoute bindings per Value type to avoid ambiguous bindings
                 services.AddScoped<IBindingModelDataReceiver<Guid, User>, GuidUserDataReceiver>();
@@ -65,10 +64,10 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
     }
     
     // Custom factory which does not include Detail,
-    // unless the exception is RouteEntityNotFoundException on a Guid with the Entity User 
-    public class CustomRouteBindingProblemDetailsFactory : IRouteBindingProblemDetailsFactory
+    // unless the exception is EntityNotFoundException on a Guid with the Entity User 
+    public class CustomEntityBindingProblemDetailsFactory : IEntityBindingProblemDetailsFactory
     {
-        public ProblemDetails Create(HttpContext context, RouteBindingException exception)
+        public ProblemDetails Create(HttpContext context, EntityBindingException exception)
         {
             var problem = new ProblemDetails
             {
@@ -76,7 +75,7 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
                 Instance = context.Request.Path
             };
 
-            if (exception is RouteEntityNotFoundException { EntityName: "User" })
+            if (exception is EntityNotFoundException { EntityName: "User" })
             {
                 problem.Detail = exception.Message;
             }
@@ -95,7 +94,7 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
         var body = await response.Content.ReadAsStringAsync();
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
-        var expected = new InvalidRouteParameterFormatException("id", typeof(Guid), typeof(string));
+        var expected = new InvalidEntityParameterFormatException("id", typeof(Guid), typeof(string));
         
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);
@@ -113,7 +112,7 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
         var body = await response.Content.ReadAsStringAsync();
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
-        var expected = new RouteEntityNotFoundException("User", userId);
+        var expected = new EntityNotFoundException("User", userId);
         
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);
@@ -132,7 +131,7 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
         var body = await response.Content.ReadAsStringAsync();
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
-        var expected = new RouteEntityNotFoundException("Product", productId);
+        var expected = new EntityNotFoundException("Product", productId);
         
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);

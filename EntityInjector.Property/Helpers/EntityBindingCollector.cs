@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using EntityInjector.Core.Exceptions;
 using EntityInjector.Property.Attributes;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
@@ -60,8 +61,9 @@ public static class EntityBindingCollector
 
                 if (idProp == null)
                 {
-                    throw new CustomAttributeFormatException(
-                        $"Bad configuration for attribute on {prop.Name}, no property with name {attr.PropertyName}");
+                    throw new MissingEntityAttributeException(
+                        prop.Name,
+                        $"Expected property '{attr.PropertyName}' to exist on '{prop.DeclaringType?.Name}' for attribute on '{prop.Name}");
                 }
 
                 var idValue = idProp.GetValue(currentObject);

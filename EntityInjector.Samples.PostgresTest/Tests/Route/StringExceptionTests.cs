@@ -1,10 +1,10 @@
 using System.Net;
 using System.Text.Json;
+using EntityInjector.Core.Exceptions;
 using EntityInjector.Core.Exceptions.Middleware;
 using EntityInjector.Core.Interfaces;
 using EntityInjector.Route.BindingMetadata.Collection;
 using EntityInjector.Route.BindingMetadata.Entity;
-using EntityInjector.Route.Exceptions;
 using EntityInjector.Samples.PostgresTest.DataReceivers;
 using EntityInjector.Samples.PostgresTest.Models;
 using EntityInjector.Samples.PostgresTest.Models.Entities;
@@ -80,7 +80,7 @@ public class StringExceptionTests : IClassFixture<PostgresTestFixture>
         var body = await response.Content.ReadAsStringAsync();
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
-        var expected = new RouteEntityNotFoundException("User", nonexistentUserId);
+        var expected = new EntityNotFoundException("User", nonexistentUserId);
         
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);
@@ -104,7 +104,7 @@ public class StringExceptionTests : IClassFixture<PostgresTestFixture>
         var body = await response.Content.ReadAsStringAsync();
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
-        var expected = new MissingRouteParameterException("id");
+        var expected = new MissingEntityParameterException("id");
         
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);
@@ -147,7 +147,7 @@ public class StringExceptionTests : IClassFixture<PostgresTestFixture>
         var body = await response.Content.ReadAsStringAsync();
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
-        var expected = new EmptyRouteSegmentListException("ids");
+        var expected = new EmptyEntitySegmentListException("ids");
 
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);

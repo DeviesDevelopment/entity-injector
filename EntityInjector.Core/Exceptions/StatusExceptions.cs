@@ -1,10 +1,9 @@
-using EntityInjector.Core.Exceptions;
 using Microsoft.AspNetCore.Http;
 
-namespace EntityInjector.Route.Exceptions;
+namespace EntityInjector.Core.Exceptions;
 
-public sealed class RouteEntityNotFoundException(string entityName, object? id)
-    : RouteBindingException($"No {entityName} found for ID '{id}'.")
+public sealed class EntityNotFoundException(string entityName, object? id)
+    : EntityBindingException($"No {entityName} found for ID '{id}'.")
 {
     public override int StatusCode => StatusCodes.Status404NotFound;
 
@@ -12,14 +11,14 @@ public sealed class RouteEntityNotFoundException(string entityName, object? id)
     public object? Id { get; } = id;
 }
 
-public sealed class MissingRouteAttributeException(string parameterName, string expectedAttribute)
-    : RouteBindingException($"Missing required {expectedAttribute} on action parameter '{parameterName}'.")
+public sealed class MissingEntityAttributeException(string parameterName, string expectedAttribute)
+    : EntityBindingException($"Missing required {expectedAttribute} on action parameter '{parameterName}'.")
 {
     public override int StatusCode => StatusCodes.Status400BadRequest;
 }
 
 public sealed class UnsupportedBindingTypeException(Type targetType)
-    : RouteBindingException($"The type '{targetType.Name}' is not supported for route binding.")
+    : EntityBindingException($"The type '{targetType.Name}' is not supported for route binding.")
 {
     public override int StatusCode => StatusCodes.Status400BadRequest;
 
@@ -27,7 +26,7 @@ public sealed class UnsupportedBindingTypeException(Type targetType)
 }
 
 public sealed class BindingReceiverNotRegisteredException(Type receiverType)
-    : RouteBindingException($"No binding receiver registered for type '{receiverType.FullName}'.")
+    : EntityBindingException($"No binding receiver registered for type '{receiverType.FullName}'.")
 {
     public override int StatusCode => StatusCodes.Status500InternalServerError;
 
@@ -35,7 +34,7 @@ public sealed class BindingReceiverNotRegisteredException(Type receiverType)
 }
 
 public sealed class BindingReceiverContractException(string methodName, Type receiverType)
-    : RouteBindingException($"Expected method '{methodName}' not found on receiver type '{receiverType.Name}'.")
+    : EntityBindingException($"Expected method '{methodName}' not found on receiver type '{receiverType.Name}'.")
 {
     public override int StatusCode => StatusCodes.Status500InternalServerError;
 
@@ -44,7 +43,7 @@ public sealed class BindingReceiverContractException(string methodName, Type rec
 }
 
 public sealed class UnexpectedBindingResultException(Type expected, Type? actual)
-    : RouteBindingException($"Expected result of type '{expected.Name}', but got '{actual?.Name ?? "null"}'.")
+    : EntityBindingException($"Expected result of type '{expected.Name}', but got '{actual?.Name ?? "null"}'.")
 {
     public override int StatusCode => StatusCodes.Status500InternalServerError;
 
@@ -52,16 +51,16 @@ public sealed class UnexpectedBindingResultException(Type expected, Type? actual
     public Type? ActualType { get; } = actual;
 }
 
-public sealed class MissingRouteParameterException(string parameterName)
-    : RouteBindingException($"Route parameter '{parameterName}' was not found. Ensure it is correctly specified in the route.")
+public sealed class MissingEntityParameterException(string parameterName)
+    : EntityBindingException($"Route parameter '{parameterName}' was not found. Ensure it is correctly specified in the route.")
 {
     public override int StatusCode => StatusCodes.Status400BadRequest;
 
     public string ParameterName { get; } = parameterName;
 }
 
-public sealed class InvalidRouteParameterFormatException(string parameterName, Type expectedType, Type actualType)
-    : RouteBindingException($"Route parameter '{parameterName}' is of type '{actualType.Name}', but type '{expectedType.Name}' was expected.")
+public sealed class InvalidEntityParameterFormatException(string parameterName, Type expectedType, Type actualType)
+    : EntityBindingException($"Route parameter '{parameterName}' is of type '{actualType.Name}', but type '{expectedType.Name}' was expected.")
 {
     public override int StatusCode => StatusCodes.Status422UnprocessableEntity;
 
@@ -70,8 +69,8 @@ public sealed class InvalidRouteParameterFormatException(string parameterName, T
     public Type ActualType { get; } = actualType;
 }
 
-public sealed class EmptyRouteSegmentListException(string parameterName)
-    : RouteBindingException($"Route parameter '{parameterName}' did not contain any valid string segments.")
+public sealed class EmptyEntitySegmentListException(string parameterName)
+    : EntityBindingException($"Route parameter '{parameterName}' did not contain any valid string segments.")
 {
     public override int StatusCode => StatusCodes.Status422UnprocessableEntity;
 

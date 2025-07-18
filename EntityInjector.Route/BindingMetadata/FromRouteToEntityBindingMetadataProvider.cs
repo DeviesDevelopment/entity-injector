@@ -1,6 +1,6 @@
+using EntityInjector.Core.Exceptions;
 using EntityInjector.Core.Interfaces;
 using EntityInjector.Route.Attributes;
-using EntityInjector.Route.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
@@ -33,14 +33,14 @@ public abstract class FromRouteToEntityBindingMetadataProvider<TKey, TValue> : I
 
         var attribute = metadata.Attributes.ParameterAttributes?.OfType<FromRouteToEntityAttribute>().FirstOrDefault();
         if (attribute == null)
-            throw new MissingRouteAttributeException(bindingContext.FieldName ?? "unknown", nameof(FromRouteToEntityAttribute));
+            throw new MissingEntityAttributeException(bindingContext.FieldName ?? "unknown", nameof(FromRouteToEntityAttribute));
 
         var id = GetId(bindingContext.ActionContext, attribute.ArgumentName);
         var dataType = metadata.ModelType;
 
         var entity = await GetEntityAsync(id, bindingContext.ActionContext, dataType, attribute.MetaData);
         if (entity is null)
-            throw new RouteEntityNotFoundException(dataType.Name, id);
+            throw new EntityNotFoundException(dataType.Name, id);
 
         bindingContext.Result = ModelBindingResult.Success(entity);
     }

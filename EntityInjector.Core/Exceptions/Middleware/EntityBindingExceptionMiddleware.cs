@@ -4,12 +4,12 @@ using Microsoft.Extensions.Logging;
 
 namespace EntityInjector.Core.Exceptions.Middleware;
 
-public class RouteBindingExceptionMiddleware(
+public class EntityBindingExceptionMiddleware(
     RequestDelegate next,
-    ILogger<RouteBindingExceptionMiddleware> logger,
-    IRouteBindingProblemDetailsFactory? problemDetailsFactory = null)
+    ILogger<EntityBindingExceptionMiddleware> logger,
+    IEntityBindingProblemDetailsFactory? problemDetailsFactory = null)
 {
-    private readonly IRouteBindingProblemDetailsFactory _problemDetailsFactory = problemDetailsFactory ?? new DefaultRouteBindingProblemDetailsFactory();
+    private readonly IEntityBindingProblemDetailsFactory _problemDetailsFactory = problemDetailsFactory ?? new DefaultEntityBindingProblemDetailsFactory();
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -21,7 +21,7 @@ public class RouteBindingExceptionMiddleware(
         {
             await next(context);
         }
-        catch (RouteBindingException ex)
+        catch (EntityBindingException ex)
         {
             logger.LogWarning(ex, "Route binding error: {Message}", ex.Message);
 

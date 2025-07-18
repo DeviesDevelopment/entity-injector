@@ -1,9 +1,9 @@
 using System.Text.Json;
+using EntityInjector.Core.Exceptions;
 using EntityInjector.Core.Exceptions.Middleware;
 using EntityInjector.Core.Interfaces;
 using EntityInjector.Route.BindingMetadata.Collection;
 using EntityInjector.Route.BindingMetadata.Entity;
-using EntityInjector.Route.Exceptions;
 using EntityInjector.Samples.PostgresTest.DataReceivers;
 using EntityInjector.Samples.PostgresTest.Models;
 using EntityInjector.Samples.PostgresTest.Models.Entities;
@@ -69,7 +69,7 @@ public class GuidExceptionTests : IClassFixture<PostgresTestFixture>
         var body = await response.Content.ReadAsStringAsync();
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
-        var expected = new InvalidRouteParameterFormatException("id", typeof(Guid), typeof(string));
+        var expected = new InvalidEntityParameterFormatException("id", typeof(Guid), typeof(string));
     
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);

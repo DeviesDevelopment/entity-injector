@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Reflection;
+using EntityInjector.Core.Exceptions;
 using EntityInjector.Core.Interfaces;
-using EntityInjector.Property.Exceptions;
 using EntityInjector.Property.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -104,50 +104,54 @@ public abstract class FromPropertyToEntityActionFilter<TKey>(
         await next();
     }
 
-    private async Task<IDictionary?> GetEntitiesAsync(List<TKey> ids, HttpContext context, Type dataType,
+    private async Task<IDictionary?> GetEntitiesAsync(
+        List<TKey> ids,
+        HttpContext context,
+        Type dataType,
         Dictionary<string, string> metaData)
     {
-        var receiver =
-            serviceProvider.GetService(typeof(IBindingModelDataReceiver<,>).MakeGenericType(typeof(TKey), dataType));
+        var receiverType = typeof(IBindingModelDataReceiver<,>).MakeGenericType(typeof(TKey), dataType);
+        var receiver = serviceProvider.GetService(receiverType);
+
         if (receiver == null)
         {
-            logger.LogError($"no receiver registered for type");
-            throw new InternalServerErrorException("no receiver registered for type");
+            logger.LogError("No binding receiver registered for type {ReceiverType}", receiverType.FullName);
+            throw new BindingReceiverNotRegisteredException(receiverType);
         }
 
         var method = receiver.GetType().GetMethod(nameof(IBindingModelDataReceiver<int, int>.GetByKeys));
         if (method == null)
         {
-            logger.LogError($"no receiver registered for type");
-            throw new InternalServerErrorException("no receiver registered for type");
+            logger.LogError("Expected method GetByKeys not found on receiver type {ReceiverType}", receiver.GetType().Name);
+            throw new BindingReceiverContractException(nameof(IBindingModelDataReceiver<TKey, object>.GetByKeys), receiver.GetType());
         }
 
         var parameters = new object?[] { ids, context, metaData };
         var invokeTask = method.Invoke(receiver, parameters);
 
-        if (invokeTask == null)
+        if (invokeTask is not Task task)
         {
-            logger.LogError($"method return null");
-            throw new InternalServerErrorException("method return null");
+            logger.LogError("GetByKeys method did not return a Task for type {ReceiverType}", receiver.GetType().Name);
+            throw new UnexpectedBindingResultException(typeof(Task), invokeTask?.GetType());
         }
 
-        var task = (Task)invokeTask;
         await task;
 
         var resultProperty = task.GetType().GetProperty(nameof(Task<int>.Result));
         if (resultProperty == null)
         {
-            logger.LogError($"result property is null");
-            throw new InternalServerErrorException("result property is null");
+            logger.LogError("Result property missing on returned Task<{ReceiverType}>", receiver.GetType().Name);
+            throw new UnexpectedBindingResultException(typeof(IDictionary), null);
         }
 
         var value = resultProperty.GetValue(task);
-        if (value == null)
+        if (value is not IDictionary dict)
         {
-            logger.LogError($"result is null");
-            throw new InternalServerErrorException("result is null");
+            logger.LogError("Expected IDictionary result but got {ActualType}", value?.GetType().Name ?? "null");
+            throw new UnexpectedBindingResultException(typeof(IDictionary), value?.GetType());
         }
 
-        return (IDictionary)value;
+        return dict;
     }
+
 }

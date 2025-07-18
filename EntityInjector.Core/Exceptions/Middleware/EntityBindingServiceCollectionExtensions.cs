@@ -3,12 +3,12 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace EntityInjector.Core.Exceptions.Middleware;
 
-public static class RouteBindingServiceCollectionExtensions
+public static class EntityBindingServiceCollectionExtensions
 {
     public static IServiceCollection AddRouteBinding(this IServiceCollection services)
     {
         // Register default formatter if user hasn't already
-        services.TryAddSingleton<IRouteBindingProblemDetailsFactory, DefaultRouteBindingProblemDetailsFactory>();
+        services.TryAddSingleton<IEntityBindingProblemDetailsFactory, DefaultEntityBindingProblemDetailsFactory>();
         return services;
     }
 }

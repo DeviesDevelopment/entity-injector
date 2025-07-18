@@ -1,4 +1,4 @@
-using EntityInjector.Route.Exceptions;
+using EntityInjector.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
@@ -11,13 +11,13 @@ public class IntEntityBindingMetadataProvider<TValue> : FromRouteToEntityBinding
         var routeValue = context.HttpContext.GetRouteValue(argumentName);
 
         if (routeValue == null)
-            throw new MissingRouteParameterException(argumentName);
+            throw new MissingEntityParameterException(argumentName);
 
         return routeValue switch
         {
             int g => g,
             string s => int.Parse(s),
-            _ => throw new InvalidRouteParameterFormatException(argumentName, routeValue.GetType(), routeValue.GetType())
+            _ => throw new InvalidEntityParameterFormatException(argumentName, routeValue.GetType(), routeValue.GetType())
         };
     }
 }

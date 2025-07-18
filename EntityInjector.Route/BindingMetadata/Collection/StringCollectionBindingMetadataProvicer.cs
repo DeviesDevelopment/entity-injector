@@ -1,4 +1,4 @@
-using EntityInjector.Route.Exceptions;
+using EntityInjector.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
@@ -11,11 +11,11 @@ public class StringCollectionBindingMetadataProvider<TValue> : FromRouteToCollec
         var routeValue = context.HttpContext.GetRouteValue(argumentName);
 
         if (routeValue == null)
-            throw new MissingRouteParameterException(argumentName);
+            throw new MissingEntityParameterException(argumentName);
 
         var rawString = routeValue.ToString();
         if (string.IsNullOrWhiteSpace(rawString))
-            throw new InvalidRouteParameterFormatException(argumentName, typeof(string), routeValue.GetType());
+            throw new InvalidEntityParameterFormatException(argumentName, typeof(string), routeValue.GetType());
 
         var segments = rawString
             .Split(',', StringSplitOptions.RemoveEmptyEntries)
@@ -24,7 +24,7 @@ public class StringCollectionBindingMetadataProvider<TValue> : FromRouteToCollec
             .ToList();
 
         if (segments.Count == 0)
-            throw new EmptyRouteSegmentListException(argumentName);
+            throw new EmptyEntitySegmentListException(argumentName);
 
         return segments;
     }
