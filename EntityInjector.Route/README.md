@@ -31,14 +31,14 @@ options.ModelMetadataDetailsProviders.Add(new GuidEntityBindingMetadataProvider<
 3. (Optionally) Configure exception handling:
 
 ```csharp
-services.AddRouteBinding();
+services.AddEntityBinding();
 ...
-app.UseRouteBinding();
+app.UseEntityBinding();
 ```
 
 You may also opt to configure your own `ProblemDetailsFactory` to customize your exception logic (to for example hide
 error messages).
-In such a case avoid `app.UseRouteBinding()` and instead add your own:
+In such a case avoid `app.UseEntityBinding()` and instead add your own:
 
 ```csharp
 services.TryAddSingleton<IRouteBindingProblemDetailsFactory, YourCustomRouteBindingProblemDetailsFactory>();

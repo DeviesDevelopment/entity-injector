@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using EntityInjector.Core.Exceptions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace EntityInjector.Property.Helpers;
@@ -49,7 +50,7 @@ internal static class EntityPopulator
                 dict![id!] = fetchedEntities[id!];
             else if (includeNulls)
                 dict![id!] = null;
-            else if (!cleanNoMatch) modelState.AddModelError(prop.Name, $"No matching entity found for ID '{id}'.");
+            else if (!cleanNoMatch) throw new EntityNotFoundException(prop.Name, id);
 
         prop.SetValue(targetObject, dict);
     }
@@ -70,7 +71,7 @@ internal static class EntityPopulator
                 matched.Add(fetchedEntities[id!]);
             else if (includeNulls)
                 matched.Add(null);
-            else if (!cleanNoMatch) modelState.AddModelError(prop.Name, $"No matching entity found for ID '{id}'.");
+            else if (!cleanNoMatch) throw new EntityNotFoundException(prop.Name, id);
 
         prop.SetValue(targetObject, ConvertListToTargetType(matched, prop.PropertyType));
     }
@@ -88,7 +89,7 @@ internal static class EntityPopulator
             prop.SetValue(targetObject, fetchedEntities[id!]);
         else if (includeNulls)
             prop.SetValue(targetObject, null);
-        else if (!cleanNoMatch) modelState.AddModelError(prop.Name, $"No matching entity found for ID '{id}'.");
+        else if (!cleanNoMatch) throw new EntityNotFoundException(prop.Name, id);
     }
 
     private static object? ConvertListToTargetType(List<object?> values, Type propType)

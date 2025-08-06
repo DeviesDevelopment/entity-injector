@@ -23,19 +23,21 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
 {
     private readonly HttpClient _client;
     private readonly PostgresTestFixture _fixture;
+
     private readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
-    
+
     public CustomFactoryExceptionTests(PostgresTestFixture fixture)
     {
         var builder = new WebHostBuilder()
             .ConfigureServices(services =>
             {
                 services.AddSingleton(fixture.DbContext);
-                services.TryAddSingleton<IEntityBindingProblemDetailsFactory, CustomEntityBindingProblemDetailsFactory>();
-                
+                services
+                    .TryAddSingleton<IEntityBindingProblemDetailsFactory, CustomEntityBindingProblemDetailsFactory>();
+
                 // Use only one type of FromRoute bindings per Value type to avoid ambiguous bindings
                 services.AddScoped<IBindingModelDataReceiver<Guid, User>, GuidUserDataReceiver>();
                 services.AddScoped<IBindingModelDataReceiver<int, Product>, IntProductDataReceiver>();
@@ -47,20 +49,18 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
                 {
                     // Use only one type of FromRoute bindings per Value type to avoid ambiguous bindings
                     options.ModelMetadataDetailsProviders.Add(new GuidEntityBindingMetadataProvider<User>());
-                    
+
                     options.ModelMetadataDetailsProviders.Add(new IntEntityBindingMetadataProvider<Product>());
-                    
                 });
                 services.PostConfigureAll<SwaggerGenOptions>(o =>
                 {
                     o.OperationFilter<FromRouteToEntityOperationFilter>();
-                });                
-
+                });
             })
             .Configure(app =>
             {
                 app.UseRouting();
-                app.UseRouteBinding();
+                app.UseEntityBinding();
                 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             });
 
@@ -68,28 +68,7 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
         _client = server.CreateClient();
         _fixture = fixture;
     }
-    
-    // Custom factory which does not include Detail,
-    // unless the exception is EntityNotFoundException on a Guid with the Entity User 
-    public class CustomEntityBindingProblemDetailsFactory : IEntityBindingProblemDetailsFactory
-    {
-        public ProblemDetails Create(HttpContext context, EntityBindingException exception)
-        {
-            var problem = new ProblemDetails
-            {
-                Status = exception.StatusCode,
-                Instance = context.Request.Path
-            };
 
-            if (exception is EntityNotFoundException { EntityName: "User" })
-            {
-                problem.Detail = exception.Message;
-            }
-
-            return problem;
-        }
-    }
-    
     [Fact]
     public async Task InvalidRouteParameterFormatException_HasNoDetail()
     {
@@ -101,7 +80,7 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
         var expected = new InvalidEntityParameterFormatException("id", typeof(Guid), typeof(string));
-        
+
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);
         Assert.Null(problem.Detail);
@@ -119,13 +98,13 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
         var expected = new EntityNotFoundException("User", userId);
-        
+
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);
         Assert.NotNull(problem.Detail);
         Assert.Equal(expected.Message, problem.Detail);
     }
-    
+
     [Fact]
     public async Task RouteEntityNotFoundException_ForProduct_HasNoDetail()
     {
@@ -138,9 +117,27 @@ public class CustomFactoryExceptionTests : IClassFixture<PostgresTestFixture>
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
         var expected = new EntityNotFoundException("Product", productId);
-        
+
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem!.Status);
         Assert.Null(problem.Detail);
+    }
+
+    // Custom factory which does not include Detail,
+    // unless the exception is EntityNotFoundException on a Guid with the Entity User 
+    public class CustomEntityBindingProblemDetailsFactory : IEntityBindingProblemDetailsFactory
+    {
+        public ProblemDetails Create(HttpContext context, EntityBindingException exception)
+        {
+            var problem = new ProblemDetails
+            {
+                Status = exception.StatusCode,
+                Instance = context.Request.Path
+            };
+
+            if (exception is EntityNotFoundException { EntityName: "User" }) problem.Detail = exception.Message;
+
+            return problem;
+        }
     }
 }

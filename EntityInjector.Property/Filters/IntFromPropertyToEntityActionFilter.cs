@@ -8,7 +8,7 @@ public class IntFromPropertyToEntityActionFilter(
     ILogger<IntFromPropertyToEntityActionFilter> logger)
     : FromPropertyToEntityActionFilter<int>(serviceProvider, logger)
 {
-    protected override int ConvertToKey(object rawValue)
+    protected override int ConvertToKey(object rawValue, string propertyName)
     {
         return rawValue switch
         {
@@ -20,7 +20,7 @@ public class IntFromPropertyToEntityActionFilter(
             double d when d % 1 == 0 && d is >= int.MinValue and <= int.MaxValue => (int)d,
             float f when f % 1 == 0 && f is >= int.MinValue and <= int.MaxValue => (int)f,
             decimal m when m % 1 == 0 && m is >= int.MinValue and <= int.MaxValue => (int)m,
-            _ => throw new InvalidEntityParameterFormatException("id", typeof(int), rawValue.GetType())
+            _ => throw new InvalidEntityParameterFormatException(propertyName, typeof(int), rawValue.GetType())
         };
     }
 

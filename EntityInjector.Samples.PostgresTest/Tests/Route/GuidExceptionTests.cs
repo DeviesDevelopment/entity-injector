@@ -35,7 +35,7 @@ public class GuidExceptionTests : IClassFixture<PostgresTestFixture>
             .ConfigureServices(services =>
             {
                 services.AddSingleton(fixture.DbContext);
-                services.AddRouteBinding();
+                services.AddEntityBinding();
                 // Use only one type of FromRoute bindings per Value type to avoid ambiguous bindings
                 services.AddScoped<IBindingModelDataReceiver<Guid, User>, GuidUserDataReceiver>();
 
@@ -56,7 +56,7 @@ public class GuidExceptionTests : IClassFixture<PostgresTestFixture>
             .Configure(app =>
             {
                 app.UseRouting();
-                app.UseRouteBinding();
+                app.UseEntityBinding();
                 app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             });
 

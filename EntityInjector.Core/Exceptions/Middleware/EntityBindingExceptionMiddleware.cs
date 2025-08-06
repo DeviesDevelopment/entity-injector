@@ -25,7 +25,7 @@ public class EntityBindingExceptionMiddleware(
         }
         catch (EntityBindingException ex)
         {
-            logger.LogWarning(ex, "Route binding error: {Message}", ex.Message);
+            logger.LogWarning(ex, "Entity binding error: {Message}", ex.Message);
 
             var problemDetails = _problemDetailsFactory.Create(context, ex);
 

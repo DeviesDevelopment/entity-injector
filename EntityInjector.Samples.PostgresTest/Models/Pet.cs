@@ -1,5 +1,6 @@
 using EntityInjector.Property.Attributes;
 using EntityInjector.Samples.PostgresTest.Models.Entities;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace EntityInjector.Samples.PostgresTest.Models;
 

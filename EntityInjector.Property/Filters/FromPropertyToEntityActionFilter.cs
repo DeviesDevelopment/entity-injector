@@ -35,16 +35,7 @@ public abstract class FromPropertyToEntityActionFilter<TKey>(
             var allIds = group.Bindings.SelectMany(b => b.Ids).Distinct().ToList();
             if (allIds.Count == 0) continue;
 
-            IDictionary? fetchedEntities;
-            try
-            {
-                fetchedEntities = await GetEntitiesAsync(allIds, context.HttpContext, group.EntityType, group.MetaData);
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Error fetching entities for type {TypeName}", group.EntityType.Name);
-                continue;
-            }
+            var fetchedEntities = await GetEntitiesAsync(allIds, context.HttpContext, group.EntityType, group.MetaData);
 
             foreach (var binding in group.Bindings)
                 EntityPopulator.Populate(
@@ -60,7 +51,7 @@ public abstract class FromPropertyToEntityActionFilter<TKey>(
         await next();
     }
 
-    protected abstract TKey ConvertToKey(object rawValue);
+    protected abstract TKey ConvertToKey(object rawValue, string propertyName);
 
     protected abstract TKey GetDefaultValueForNull();
 
@@ -72,8 +63,8 @@ public abstract class FromPropertyToEntityActionFilter<TKey>(
         return idValue switch
         {
             null when isMarkedAsNullable => GetDefaultValueForNull(),
-            null => throw new ArgumentNullException($"{propInfo.Name} was null but not marked nullable"),
-            _ => ConvertToKey(idValue)
+            null => throw new MissingEntityParameterException(propInfo.Name),
+            _ => ConvertToKey(idValue, propInfo.Name)
         };
     }
 
@@ -92,7 +83,7 @@ public abstract class FromPropertyToEntityActionFilter<TKey>(
             }
             else
             {
-                ids.Add(ConvertToKey(item));
+                ids.Add(ConvertToKey(item, propInfo.Name));
             }
 
         return ids;

@@ -8,13 +8,13 @@ public class GuidFromPropertyToEntityActionFilter(
     ILogger<GuidFromPropertyToEntityActionFilter> logger)
     : FromPropertyToEntityActionFilter<Guid>(serviceProvider, logger)
 {
-    protected override Guid ConvertToKey(object rawValue)
+    protected override Guid ConvertToKey(object rawValue, string propertyName)
     {
         return rawValue switch
         {
             Guid g => g,
             string s when Guid.TryParse(s, out var parsed) => parsed,
-            _ => throw new InvalidEntityParameterFormatException("id", typeof(Guid), rawValue.GetType())
+            _ => throw new InvalidEntityParameterFormatException(propertyName, typeof(Guid), rawValue.GetType())
         };
     }
 
