@@ -28,23 +28,25 @@ public static class EntityBindingCollector
         if (IsSimpleType(objType))
             return;
 
-        if (currentObject is IEnumerable enumerable && objType != typeof(string))
+        switch (currentObject)
         {
-            foreach (var item in enumerable)
-                Recurse(item, toProcess, modelState);
-
-            return;
-        }
-
-        if (currentObject is IDictionary dict)
-        {
-            foreach (var key in dict.Keys)
+            case IEnumerable enumerable when objType != typeof(string):
             {
-                var val = dict[key];
-                Recurse(val, toProcess, modelState);
-            }
+                foreach (var item in enumerable)
+                    Recurse(item, toProcess, modelState);
 
-            return;
+                return;
+            }
+            case IDictionary dict:
+            {
+                foreach (var key in dict.Keys)
+                {
+                    var val = dict[key];
+                    Recurse(val, toProcess, modelState);
+                }
+
+                return;
+            }
         }
 
         foreach (var prop in objType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
@@ -91,24 +93,27 @@ public static class EntityBindingCollector
     private static List<TKey> ExtractIds<TKey>(object? idValue)
     {
         var result = new List<TKey>();
-        if (idValue == null)
-            return result;
-
-        if (idValue is TKey single)
+        switch (idValue)
         {
-            result.Add(single);
-        }
-        else if (idValue is IEnumerable enumerable && !(idValue is string))
-        {
-            foreach (var item in enumerable)
-                if (item is TKey tk)
-                    result.Add(tk);
-        }
-        else if (idValue is IDictionary dict)
-        {
-            foreach (var key in dict.Keys)
-                if (key is TKey tk)
-                    result.Add(tk);
+            case null:
+                break;
+            case TKey single:
+                result.Add(single);
+                break;
+            case IEnumerable enumerable when !(idValue is string):
+            {
+                foreach (var item in enumerable)
+                    if (item is TKey tk)
+                        result.Add(tk);
+                break;
+            }
+            case IDictionary dict:
+            {
+                foreach (var key in dict.Keys)
+                    if (key is TKey tk)
+                        result.Add(tk);
+                break;
+            }
         }
 
         return result;

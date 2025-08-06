@@ -77,7 +77,7 @@ public abstract class FromPropertyToEntityActionFilter<TKey>(
             if (item == null)
             {
                 if (!isMarkedAsNullable)
-                    throw new ArgumentNullException($"{propInfo.Name} contained null but is not nullable");
+                    throw new MissingEntityParameterException(propInfo.Name);
 
                 ids.Add(GetDefaultValueForNull());
             }
@@ -89,7 +89,7 @@ public abstract class FromPropertyToEntityActionFilter<TKey>(
         return ids;
     }
 
-    private async Task<IDictionary?> GetEntitiesAsync(
+    private async Task<IDictionary> GetEntitiesAsync(
         List<TKey> ids,
         HttpContext context,
         Type dataType,

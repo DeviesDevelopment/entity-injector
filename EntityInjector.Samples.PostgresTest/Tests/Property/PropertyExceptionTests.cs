@@ -32,7 +32,7 @@ public class PropertyExceptionTests : IClassFixture<PostgresTestFixture>
     {
         _fixture = fixture;
     }
-    
+
     private HttpClient CreateClient(Action<IServiceCollection>? overrideServices = null)
     {
         var builder = new WebHostBuilder()
@@ -87,7 +87,7 @@ public class PropertyExceptionTests : IClassFixture<PostgresTestFixture>
         Assert.Equal(expected.StatusCode, problem!.Status);
         Assert.Equal(expected.Message, problem.Detail);
     }
-    
+
     [Fact]
     public async Task Returns500_WhenNoBindingReceiverRegistered()
     {
@@ -105,11 +105,9 @@ public class PropertyExceptionTests : IClassFixture<PostgresTestFixture>
         var problem = JsonSerializer.Deserialize<ProblemDetails>(body, _jsonOptions);
 
         var expected = new BindingReceiverNotRegisteredException(typeof(IBindingModelDataReceiver<Guid, User>));
-        
+
         Assert.NotNull(problem);
         Assert.Equal(expected.StatusCode, problem.Status);
         Assert.Equal(expected.Message, problem.Detail);
     }
-
-    
 }
