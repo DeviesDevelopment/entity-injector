@@ -12,7 +12,7 @@
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
       interval: 5s
       timeout: 5s
       retries: 12
@@ -25,7 +25,7 @@
     ports:
       - "8081:8081"
       - "1234:1234"
-    command: ["--protocol", "https"]
+    command: [ "--protocol", "https" ]
     environment:
       AZURE_COSMOS_EMULATOR_PARTITION_COUNT: 3
       AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE: "true"

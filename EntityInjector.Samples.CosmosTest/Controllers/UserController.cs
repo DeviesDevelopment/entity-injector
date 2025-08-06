@@ -1,4 +1,4 @@
-using EntityInjector.Route.Middleware.Attributes;
+using EntityInjector.Route.Attributes;
 using EntityInjector.Samples.CosmosTest.Models;
 using Microsoft.AspNetCore.Mvc;
 

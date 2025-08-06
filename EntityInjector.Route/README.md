@@ -31,18 +31,29 @@ options.ModelMetadataDetailsProviders.Add(new GuidEntityBindingMetadataProvider<
 3. (Optionally) Configure exception handling:
 
 ```csharp
-services.AddRouteBinding();
+services.AddEntityBinding();
 ...
-app.UseRouteBinding();
+app.UseEntityBinding();
 ```
 
-You may also opt to configure your own `ProblemDetailsFactory` to customize your exception logic (to for example hide error messages). 
-In such a case avoid `app.UseRouteBinding()` and instead add your own:
+You may also opt to configure your own `ProblemDetailsFactory` to customize your exception logic (to for example hide
+error messages).
+In such a case avoid `app.UseEntityBinding()` and instead add your own:
+
 ```csharp
 services.TryAddSingleton<IRouteBindingProblemDetailsFactory, YourCustomRouteBindingProblemDetailsFactory>();
 ```
 
 An example of this can be found in the `CustomFactoryExceptionTests`
+
+4. (Optionally) Add a swagger filter for the entities:
+
+```csharp
+services.PostConfigureAll<SwaggerGenOptions>(o =>
+{
+    o.OperationFilter<FromRouteToEntityOperationFilter>();
+});
+```
 
 ## Samples
 
@@ -57,12 +68,14 @@ See the Sample projects for demonstration on how to:
 
 ## Extensibility
 
-You can extend `FromRouteToEntityBindingMetadataProvider` or `FromRouteToCollectionBindingMetadataProvider` to support custom key types beyond what is included.
+You can extend `FromRouteToEntityBindingMetadataProvider` or `FromRouteToCollectionBindingMetadataProvider` to support
+custom key types beyond what is included.
 
 You can also configure your own exception management as described earlier.
 
 ## Limitations
 
 Only one key type is supported per entity type to avoid ambiguity during binding.  
-If multiple keys are needed, you can create a custom attribute extending `FromRouteToEntityAttribute` with a different name.  
+If multiple keys are needed, you can create a custom attribute extending `FromRouteToEntityAttribute` with a different
+name.  
 This is technically possible but not recommended due to potential for confusion.
